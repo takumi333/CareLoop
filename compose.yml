@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    environment:
+      TZ: Asia/Tokyo
+    volumes:
+      - ./front:/myapp
+    command: npm run dev -- -p 4000
+    ports:
+      - "4000:4000" 
+  back:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    # 外部ネットワークから接続可能にする為'0.0.0.0'を設定して起動。
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b '0.0.0.0'"
+    ports:
+      - "4001:4001" 
+    volumes:
+      - ./back:/myapp
+    depends_on:
+      - db 
+    # ターミナルから標準入力を受付可能にする
+    stdin_open: true
+    # 対話セッションを起動させる為の擬似ターミナルの生成
+    tty: true
+    environment:
+      VISUAL: vim
+      RAILS_ENV: development
+      TZ: Asia/Tokyo
+  db:
+    image: postgres:17
+    environment:
+      #ユーザー名指定なしの場合、デフォルトでpostgresになる
+      # POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: care_loop_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  postgres_data:
