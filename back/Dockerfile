@@ -11,9 +11,9 @@ RUN bundle install
 
 COPY . .
 
-RUN chmod +x ./bin/entrypoint.sh
+# RUN chmod +x ./bin/entrypoint.sh
 # ENTRYPOINT ["./bin/entrypoint.sh"]
 
 EXPOSE 4001
 
-CMD ["rails", "server", "-b", "0.0.0.0"]
+# CMD ["rails", "server", "-b", "0.0.0.0"]
