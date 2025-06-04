@@ -36,7 +36,7 @@ services:
     image: postgres:17
     environment:
       #ユーザー名指定なしの場合、デフォルトでpostgresになる
-      # POSTGRES_USER: postgres
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: care_loop_db
     ports:
