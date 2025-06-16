@@ -5,6 +5,7 @@ services:
     build:
       context: ./front
       dockerfile: Dockerfile
+    image: takumi333/careloop-front
     environment:
       TZ: Asia/Tokyo
     volumes:
@@ -16,6 +17,8 @@ services:
     build:
       context: ./back
       dockerfile: Dockerfile
+    # 本番環境時、生成するimage名と合わせる
+    image: takumi333/careloop-back
     # 外部ネットワークから接続可能にする為'0.0.0.0'を設定して起動。
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b '0.0.0.0'"
     ports:
