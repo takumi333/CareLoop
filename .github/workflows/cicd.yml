@@ -19,8 +19,8 @@ jobs:
           fetch-depth: 1
           # back ディレクトリとワークフロー定義だけ取得
           sparse-checkout: |
-            back/**
-            .github/workflows/**
+            back
+            .github/workflows
 
       - name: Log in to Docker Hub
         uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772
