@@ -32,7 +32,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804
         with:
-          images: takumi333/care-roop-api
+          images: takumi333/careloop-back
 
       - name: Build and push Docker image
         id: push
@@ -45,6 +45,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             RAILS_ENV=production
+          platforms: linux/amd64
 
       - name: Deploy to Render
         env:
