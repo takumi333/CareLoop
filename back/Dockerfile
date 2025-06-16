@@ -1,4 +1,4 @@
-FROM ruby:3.3.6
+FROM --platform=linux/amd64 ruby:3.3.6
 
 RUN apt-get update -qq && apt-get install -y \
     build-essential postgresql-client libpq-dev vim-gtk3
@@ -11,9 +11,9 @@ RUN bundle install
 
 COPY . .
 
-# RUN chmod +x ./bin/entrypoint.sh
-# ENTRYPOINT ["./bin/entrypoint.sh"]
+RUN chmod +x ./bin/entrypoint.sh
+ENTRYPOINT ["./bin/entrypoint.sh"]
 
-EXPOSE 4001
+EXPOSE 3000
 
-# CMD ["rails", "server", "-b", "0.0.0.0"]
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
