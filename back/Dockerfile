@@ -11,8 +11,9 @@ RUN bundle install
 
 COPY . .
 
-RUN chmod +x ./bin/entrypoint.sh
-ENTRYPOINT ["./bin/entrypoint.sh"]
+COPY entrypoint.sh /usr/bin/
+RUN chmod +x /usr/bin/entrypoint.sh
+ENTRYPOINT ["entrypoint.sh"]
 
 EXPOSE 3000
 
