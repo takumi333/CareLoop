@@ -36,7 +36,7 @@ services:
       RAILS_ENV: development
       TZ: Asia/Tokyo
   db:
-    image: postgres:17
+    image: postgres:16
     environment:
       #ユーザー名指定なしの場合、デフォルトでpostgresになる
       POSTGRES_USER: postgres
