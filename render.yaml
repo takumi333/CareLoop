@@ -16,7 +16,7 @@ services:
       url: takumi333/careloop-back:latest
       creds:
         fromRegistryCreds:
-          name: Docker_Hub_Credentails
+          name: Docker_Hub_Credentials
     envVars:
       - key: RAILS_ENV
         value: production
