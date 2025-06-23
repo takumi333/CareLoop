@@ -1,3 +1,4 @@
 class Question < ApplicationRecord
-  belongs_to :author_id
+  belongs_to :author, class_name: 'User'
+  has_many :comments, dependent: :destroy
 end
