@@ -11,10 +11,13 @@ class User < ApplicationRecord
   has_many :recepients, through: :sent_user_notifications, source: :recepient
   has_many :recepient_user_notifications, class_name: 'Notification', foreign_key: 'recepient_id', dependent: :destroy
   has_many :senders, through: :recepient_user_notifications, source: sender
-  has_many :room_members, class_name: 'RoomMembers', dependent: :destroy
+  # ルーム作成者がアカウント削除した時点でグループが消滅しないよう、dependent: :destroyは付けない
+  has_many :room_members, class_name: 'RoomMembers'
   has_many :rooms, through: :room_members, source: room
-  has_many :messages, foreign_key: 'sender_id', dependent: :destroy
-  has_many :messages_reads, foreign_key: 'reader_id', dependent: :destroy
-  has_many :shared_schedules, dependent: :destroy
-  has_many :schedules, through: :shared_schedules, source: user
+  # トーク相手がアカウント削除した時点で会話が消滅しないよう、dependent: :destroyは付けない
+  has_many :messages, foreign_key: 'sender_id'
+  has_many :messages_reads, foreign_key: 'reader_id'
+  # 共有相手がアカウント削除した時点で共有スケジュールが消滅しないよう、dependent: :destroyは付けない
+  has_many :shared_schedules
+  has_many :schedules, through: :shared_schedules
 end
