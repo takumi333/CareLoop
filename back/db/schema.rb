@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_06_24_122350) do
+ActiveRecord::Schema[7.2].define(version: 2025_06_25_083430) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -46,7 +46,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_24_122350) do
 
   create_table "notifications", force: :cascade do |t|
     t.bigint "sender_id", null: false
-    t.bigint "recepient_id", null: false
+    t.bigint "recipient_id", null: false
     t.bigint "comment_id", null: false
     t.bigint "message_id", null: false
     t.bigint "relation_id", null: false
@@ -56,7 +56,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_24_122350) do
     t.datetime "updated_at", null: false
     t.index ["comment_id"], name: "index_notifications_on_comment_id"
     t.index ["message_id"], name: "index_notifications_on_message_id"
-    t.index ["recepient_id"], name: "index_notifications_on_recepient_id"
+    t.index ["recipient_id"], name: "index_notifications_on_recipient_id"
     t.index ["relation_id"], name: "index_notifications_on_relation_id"
     t.index ["sender_id"], name: "index_notifications_on_sender_id"
   end
@@ -141,7 +141,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_24_122350) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.bigint "uid", null: false
+    t.string "uid", null: false
     t.string "name", null: false
     t.integer "provider", default: 0, null: false
     t.integer "role"
@@ -149,7 +149,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_24_122350) do
     t.datetime "updated_at", null: false
     t.boolean "delete_flag", default: false, null: false
     t.index ["name"], name: "index_users_on_name"
-    t.index ["uid"], name: "index_users_on_uid"
+    t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
   end
 
   add_foreign_key "comments", "questions"
@@ -161,7 +161,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_24_122350) do
   add_foreign_key "notifications", "comments"
   add_foreign_key "notifications", "messages"
   add_foreign_key "notifications", "user_relations", column: "relation_id"
-  add_foreign_key "notifications", "users", column: "recepient_id"
+  add_foreign_key "notifications", "users", column: "recipient_id"
   add_foreign_key "notifications", "users", column: "sender_id"
   add_foreign_key "profiles", "users"
   add_foreign_key "questions", "users", column: "author_id"
