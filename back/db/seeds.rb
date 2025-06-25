@@ -7,3 +7,12 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+
+GUEST_UID_BASE = "guest-#{SecureRandom.uuid}"
+
+guest = User.find_or_create_by!(uid: GUEST_UID_BASE) do |u|
+  u.name     = 'Guest User'
+  u.provider = 1
+  u.role     = 1
+end

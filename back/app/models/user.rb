@@ -8,16 +8,24 @@ class User < ApplicationRecord
   has_many :questions, foreign_key: 'author_id', dependent: :destroy
   has_many :comments, foreign_key: 'author_id', dependent: :destroy
   has_many :sent_user_notifications, class_name: 'Notification', foreign_key: 'sender_id', dependent: :destroy
-  has_many :recepients, through: :sent_user_notifications, source: :recepient
-  has_many :recepient_user_notifications, class_name: 'Notification', foreign_key: 'recepient_id', dependent: :destroy
-  has_many :senders, through: :recepient_user_notifications, source: sender
+  has_many :recipients, through: :sent_user_notifications, source: :recipient
+  has_many :recipient_user_notifications, class_name: 'Notification', foreign_key: 'recipient_id', dependent: :destroy
+  has_many :senders, through: :recepient_user_notifications, source: :sender
   # ルーム作成者がアカウント削除した時点でグループが消滅しないよう、dependent: :destroyは付けない
-  has_many :room_members, class_name: 'RoomMembers'
-  has_many :rooms, through: :room_members, source: room
+  has_many :room_members, class_name: 'RoomMember'
+  has_many :rooms, through: :room_members, source: :room
   # トーク相手がアカウント削除した時点で会話が消滅しないよう、dependent: :destroyは付けない
   has_many :messages, foreign_key: 'sender_id'
   has_many :messages_reads, foreign_key: 'reader_id'
   # 共有相手がアカウント削除した時点で共有スケジュールが消滅しないよう、dependent: :destroyは付けない
   has_many :shared_schedules
   has_many :schedules, through: :shared_schedules
+
+  enum :provider, { line: 0, guest: 1 }
+  enum :role, { patient: 0, home_care_giver: 1, medical_personal: 2 }
+
+  validates :uid,  presence: true, uniqueness: { scope: :provider }
+  validates :name, presence: true
+  validates :provider, presence: true
+  validates :role, presence: true
 end
