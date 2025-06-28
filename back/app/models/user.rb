@@ -24,8 +24,11 @@ class User < ApplicationRecord
   enum :provider, { line: 0, guest: 1 }
   enum :role, { patient: 0, home_care_giver: 1, medical_personal: 2 }
 
+  # freezeで、配列オブジェクトを固定し、実行中に追加・削除できないようにする
+  PROVIDERS = %w[line guest].freeze
+
   validates :uid,  presence: true, uniqueness: { scope: :provider }
   validates :name, presence: true
-  validates :provider, presence: true
+  validates :provider, presence: true, inclusion: { in: PROVIDERS, message: "%{value} は許可されていません" }
   validates :role, presence: true
 end
