@@ -32,7 +32,13 @@ class User < ApplicationRecord
   validates :provider, presence: true, inclusion: { in: PROVIDERS, message: "%{value} は許可されていません" }
   validates :role, presence: true
 
+  scope :deleted, -> { where(delete_flag: true)  }
+
   after_create :build_initial_profile!
+
+  def soft_delete
+    update!(delete_flag: true)
+  end
 
   def self.create_guest!
     create!(
