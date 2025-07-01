@@ -49,6 +49,10 @@ class User < ApplicationRecord
     )
   end
 
+  def active?
+    !delete_flag
+  end
+
   private
 
   def build_initial_profile!
