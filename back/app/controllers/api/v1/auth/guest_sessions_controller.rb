@@ -1,4 +1,6 @@
 class Api::V1::Auth::GuestSessionsController < ApplicationController
+  include Loggable
+
   skip_before_action :authenticate_user!, only: %i[create]
 
   def create
@@ -8,6 +10,7 @@ class Api::V1::Auth::GuestSessionsController < ApplicationController
       session[:user_id] = user.id
       render json: user, status: :created
     else
+      log_info('body: providerが不足しています。', payload: req_data)
       render json: { error: 'body: providerが不足しています。' }, status: :not_found
     end
   end
