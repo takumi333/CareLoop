@@ -5,11 +5,16 @@ import { z } from "zod";
 
 
 const authDataSchema = z.object({
-  id: z.string(),
-  uid: z.string(),
-  name: z.string(),
-  provider: z.string(),
-  role: z.string(),
+  user: z.object({
+    id: z.coerce.string(),
+    uid: z.string(),
+    name: z.string(),
+    provider: z.string(),
+    role: z.string(),
+    profile: z.object({
+      partner_id: z.number(),
+    }),
+  })
 });
 
 type AuthData = z.infer<typeof authDataSchema>;
@@ -23,7 +28,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         // Rails APIへのDBへリクエスト
         // user情報にid無いと、auth.jsは認証済みと検知しない
         try {
-          const res = await serverAxiosInstance.post("/guest", {
+          const res = await serverAxiosInstance.post("/auth/guest", {
             user: {
               provider: 'guest'
             }
@@ -34,14 +39,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return null;
           }
 
+          console.log("レスポンスデータですよ！！！！", res.data)
           const data: AuthData = authDataSchema.parse(res.data);
 
           return {
-            id: data.id,
-            uid: data.uid,
-            name: data.name,
-            provider: data.provider,
-            role: data.role
+            id: data.user.id,
+            uid: data.user.uid,
+            name: data.user.name,
+            provider: data.user.provider,
+            role: data.user.role,
+            partner_id: data.user.profile.partner_id
           }
         } catch (error) {
           // 例外エラー時

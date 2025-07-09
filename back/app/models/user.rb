@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  has_one :profiles, dependent: :destroy
+  has_one :profile, dependent: :destroy
   has_many :sent_user_relations, class_name: 'UserRelation', foreign_key: 'requester_id', dependent: :destroy
   # through: 前行で定義した関連名を使用して経由テーブルを明確化。source: 経由テーブルのどの関連名を参考にして、どのようなobjを取得するのか明確化。
   has_many :receivers, through: :sent_user_relations, source: :receiver
@@ -56,10 +56,15 @@ class User < ApplicationRecord
   private
 
   def build_initial_profile!
+    # begin
     build_profile(
       name: self.name,
-      partner_id: SecureRandom.random_number(10),
+      partner_id: SecureRandom.random_number(10**10),
       image: nil
     ).save!
+    # rescue ActiveRecord::RecordInvalid => e
+    # record = e.record
+    # record.errors.full_messages
+    # end
   end
 end
