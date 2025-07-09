@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  has_many :profiles, dependent: :destroy
+  has_one :profile, dependent: :destroy
   has_many :sent_user_relations, class_name: 'UserRelation', foreign_key: 'requester_id', dependent: :destroy
   # through: 前行で定義した関連名を使用して経由テーブルを明確化。source: 経由テーブルのどの関連名を参考にして、どのようなobjを取得するのか明確化。
   has_many :receivers, through: :sent_user_relations, source: :receiver
@@ -24,8 +24,47 @@ class User < ApplicationRecord
   enum :provider, { line: 0, guest: 1 }
   enum :role, { patient: 0, home_care_giver: 1, medical_personal: 2 }
 
+  # freezeで、配列オブジェクトを固定し、実行中に追加・削除できないようにする
+  PROVIDERS = %w[line guest].freeze
+
   validates :uid,  presence: true, uniqueness: { scope: :provider }
   validates :name, presence: true
-  validates :provider, presence: true
+  validates :provider, presence: true, inclusion: { in: PROVIDERS, message: "%{value} は許可されていません" }
   validates :role, presence: true
+
+  scope :deleted, -> { where(delete_flag: true)  }
+
+  after_create :build_initial_profile!
+
+  def soft_delete
+    update!(delete_flag: true)
+  end
+
+  def self.create_guest!
+    create!(
+      uid: SecureRandom.uuid,
+      provider: 1,
+      role: 1,
+      name: "ゲスト_#{SecureRandom.hex(4)}"
+    )
+  end
+
+  def active?
+    !delete_flag
+  end
+
+  private
+
+  def build_initial_profile!
+    # begin
+    build_profile(
+      name: self.name,
+      partner_id: SecureRandom.random_number(10**10),
+      image: nil
+    ).save!
+    # rescue ActiveRecord::RecordInvalid => e
+    # record = e.record
+    # record.errors.full_messages
+    # end
+  end
 end

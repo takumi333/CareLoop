@@ -1,4 +1,5 @@
-FROM --platform=linux/amd64 ruby:3.3.6
+FROM ruby:3.3.6
+# FROM --platform=linux/amd64 ruby:3.3.6
 
 RUN apt-get update -qq && apt-get install -y \
     build-essential postgresql-client libpq-dev vim-gtk3
