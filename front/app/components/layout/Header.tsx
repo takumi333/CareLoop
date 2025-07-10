@@ -9,7 +9,7 @@ import React from 'react'
 const Header = () => {
 
   return (
-    <header className='flex w-full items-center justify-between border-b px-4 py-2'>
+    <header className='flex w-full items-center justify-between border-b px-4 py-2 bg-blue-300'>
       <Link href="/dashboard" className="font-bold">
         CareLoop
       </Link>
