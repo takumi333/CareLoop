@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import GuestLogin from "../components/top/GuestLogin";
+import { signIn } from "@/auth";
 
 
 
@@ -27,8 +27,12 @@ export default function Top() {
             <CardTitle>在宅介護者はこちらから</CardTitle>
           </CardHeader>
           <CardContent className="flex gap-4">
-            <GuestLogin />
-            {/* <Button>ゲストログイン</Button> */}
+            <form action={async () => {
+              "use server"
+              await signIn(undefined, { redirectTo: "/dashboard" })
+            }}>
+              <Button type="submit">ゲストログイン</Button>
+            </form>
             <Button>Lineログイン</Button>
           </CardContent>
         </Card>
