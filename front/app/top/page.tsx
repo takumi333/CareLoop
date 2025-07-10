@@ -53,6 +53,12 @@ export default function Top() {
           </CardContent>
         </Card>
       </div>
+      <form className="w-full" action={async () => {
+              "use server"
+              throw new Error('テスト用の意図的な例外です')
+            }}>
+              <Button type="submit">例外エラーボタン</Button>
+            </form>
     </>
   );
 }
