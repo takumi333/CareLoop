@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { redirect, RedirectType } from 'next/navigation'
 
 import {
   Card,
@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { signIn } from "@/auth";
+import Link from 'next/link';
 
 
 
@@ -53,6 +54,17 @@ export default function Top() {
           </CardContent>
         </Card>
       </div>
+      {/* <form className="w-full" action={async () => {
+              "use server"
+              redirect("/top");
+              // await new Promise((resolve) => setTimeout(() => {
+                
+              //   return resolve
+              // }, 5000));
+            }}>
+              <Button type="submit">ロード確認ボタン</Button>
+            </form> */}
+            
     </>
   );
 }
