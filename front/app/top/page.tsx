@@ -54,17 +54,6 @@ export default function Top() {
           </CardContent>
         </Card>
       </div>
-      {/* <form className="w-full" action={async () => {
-              "use server"
-              redirect("/top");
-              // await new Promise((resolve) => setTimeout(() => {
-                
-              //   return resolve
-              // }, 5000));
-            }}>
-              <Button type="submit">ロード確認ボタン</Button>
-            </form> */}
-            
     </>
   );
 }
