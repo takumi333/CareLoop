@@ -34,6 +34,7 @@ class User < ApplicationRecord
 
   scope :deleted, -> { where(delete_flag: true)  }
 
+  # ゲストログインの場合のみ実行する条件式を加える
   after_create :build_initial_profile!
 
   def soft_delete
@@ -52,6 +53,7 @@ class User < ApplicationRecord
   def active?
     !delete_flag
   end
+
 
   private
 

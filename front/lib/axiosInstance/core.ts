@@ -12,6 +12,7 @@ const resolveBaseURL = () => {
 const coreAxiosInstance = axios.create({
   baseURL: resolveBaseURL(),
   timeout: 5000,
+  headers: { "Content-Type": "application/json" },
 });
 
 export default coreAxiosInstance

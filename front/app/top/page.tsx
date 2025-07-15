@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button"
 import { signIn } from "@/auth";
 import Link from 'next/link';
 
+import { cookies } from 'next/headers';
+
 
 
 export default function Top() {
@@ -30,11 +32,21 @@ export default function Top() {
           <CardContent className="flex gap-4">
             <form action={async () => {
               "use server"
-              await signIn(undefined, { redirectTo: "/dashboard" })
+              await signIn("credentials", { redirectTo: "/dashboard" })
             }}>
               <Button type="submit">ゲストログイン</Button>
             </form>
-            <Button>Lineログイン</Button>
+            <form action={async () => {
+              "use server";
+              (await cookies()).set("role", "home_care_giver", {
+                httpOnly: true,
+                // 本番環境のみ適用。HTTPS接続時のみしかcookieを送信できないオプション。
+                secure: process.env.NODE_ENV === "production",
+              });
+              await signIn("line", { redirectTo: "/dashboard" })
+            }}>
+              <Button>Lineログイン</Button>
+            </form>
           </CardContent>
         </Card>
         <Card>
@@ -42,7 +54,12 @@ export default function Top() {
             <CardTitle>患者はこちらから</CardTitle>
           </CardHeader>
           <CardContent>
-            <Button>Lineログイン</Button>
+            <form action={async () => {
+              "use server"
+              await signIn("line", { redirectTo: "/dashboard" })
+            }}>
+              <Button>Lineログイン</Button>
+            </form>
           </CardContent>
         </Card>
         <Card>
@@ -50,7 +67,12 @@ export default function Top() {
             <CardTitle>医療関係者はこちらから</CardTitle>
           </CardHeader>
           <CardContent>
-            <Button>Lineログイン</Button>
+            <form action={async () => {
+              "use server"
+              await signIn("line", { redirectTo: "/dashboard" })
+            }}>
+              <Button>Lineログイン</Button>
+            </form>
           </CardContent>
         </Card>
       </div>

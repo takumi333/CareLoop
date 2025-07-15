@@ -13,6 +13,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       namespace :auth do
         post   'guest',  to: 'guest_sessions#create'
+        post   'line',  to: 'line_sessions#create'
         delete 'logout', to: 'sessions#destroy'
       end
       resources :users, only: %i[create] 
