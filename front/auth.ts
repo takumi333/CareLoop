@@ -128,7 +128,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
             if (!role) return false;
             user.role = role.value;
             // cookie取得後、即削除
-            (await cookies()).delete("loginRole")
+            (await cookies()).delete("role")
 
             // パラメータからどのボタンからログインしたか取得する
             // console.log("reqチェック前")
@@ -152,11 +152,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
                 role: user.role,
               }
             })
+
+            // set-cookie戻り値を確認
+            // console.log("set-cookieの戻りを確認!!",res.headers["set-cookie"])
+            console.log("set-cookieの戻りを確認!!",res.headers)
   
             if (![200, 201].includes(res.status)) {
               console.error("ユーザー検証に失敗しました。")
               return false;
             }
+
+            // session_cookieをブラウザcookieに転送
   
             console.log("レスポンスデータ！！！！", res.data)
             const data: AuthData = authDataSchema.parse(res.data);

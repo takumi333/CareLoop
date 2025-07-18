@@ -13,6 +13,7 @@ import { signIn } from "@/auth";
 import Link from 'next/link';
 
 import { cookies } from 'next/headers';
+import LoginButton from '../components/top/LoginButton';
 
 
 
@@ -30,7 +31,9 @@ export default function Top() {
             <CardTitle>在宅介護者はこちらから</CardTitle>
           </CardHeader>
           <CardContent className="flex gap-4">
-            <form action={async () => {
+            <LoginButton provider="credentials" />
+            <LoginButton provider= "line" role='home_care_giver' />
+            {/* <form action={async () => {
               "use server"
               await signIn("credentials", { redirectTo: "/dashboard" })
             }}>
@@ -41,12 +44,12 @@ export default function Top() {
               (await cookies()).set("role", "home_care_giver", {
                 httpOnly: true,
                 // 本番環境のみ適用。HTTPS接続時のみしかcookieを送信できないオプション。
-                secure: process.env.NODE_ENV === "production",
+                secure: true,
               });
               await signIn("line", { redirectTo: "/dashboard" })
             }}>
               <Button>Lineログイン</Button>
-            </form>
+            </form> */}
           </CardContent>
         </Card>
         <Card>
@@ -54,12 +57,13 @@ export default function Top() {
             <CardTitle>患者はこちらから</CardTitle>
           </CardHeader>
           <CardContent>
-            <form action={async () => {
+          <LoginButton provider= "line" role='patient' />
+            {/* <form action={async () => {
               "use server"
               await signIn("line", { redirectTo: "/dashboard" })
             }}>
               <Button>Lineログイン</Button>
-            </form>
+            </form> */}
           </CardContent>
         </Card>
         <Card>
@@ -67,12 +71,13 @@ export default function Top() {
             <CardTitle>医療関係者はこちらから</CardTitle>
           </CardHeader>
           <CardContent>
-            <form action={async () => {
+          <LoginButton provider= "line" role='medical_personal' />
+            {/* <form action={async () => {
               "use server"
               await signIn("line", { redirectTo: "/dashboard" })
             }}>
               <Button>Lineログイン</Button>
-            </form>
+            </form> */}
           </CardContent>
         </Card>
       </div>

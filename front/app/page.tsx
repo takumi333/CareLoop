@@ -1,7 +1,8 @@
 import Image from "next/image";
+import Top from "./top/page";
 
 
-export default function Top() {
+export default function Home() {
   
   return (
     <Top />

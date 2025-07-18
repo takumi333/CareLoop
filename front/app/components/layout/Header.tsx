@@ -1,6 +1,7 @@
 import { signOut } from '@/auth'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet"
+import { serverAxiosInstance } from '@/lib/axiosInstance/server'
 import { Menu } from "lucide-react"
 import Link from "next/link"
 
@@ -17,6 +18,8 @@ const Header = () => {
         <form
           action={async () => {
             'use server';
+            const res = await serverAxiosInstance.delete("/auth/logout")
+            if (res.status !== 200) console.log("cookie.user_idが削除出来ていません。");
             await signOut({ redirectTo: '/top' });
           }}
         >

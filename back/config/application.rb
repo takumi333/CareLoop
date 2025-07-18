@@ -36,7 +36,7 @@ module Myapp
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
-    config.session_store :cookie_store, key: '_care_loop_session', expire_after: 14.days, secure: Rails.env.production?, same_site: :none, httponly: true
+    config.session_store :cookie_store, key: '_care_loop_session', expire_after: 14.days, secure: Rails.env.production?, same_site: :lax, httponly: true
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use config.session_store, config.session_options
 
