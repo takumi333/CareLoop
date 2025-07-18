@@ -4,6 +4,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/s
 import { serverAxiosInstance } from '@/lib/axiosInstance/server'
 import { Menu } from "lucide-react"
 import Link from "next/link"
+import { cookies } from 'next/headers'
 
 import React from 'react'
 
@@ -18,8 +19,12 @@ const Header = () => {
         <form
           action={async () => {
             'use server';
-            const res = await serverAxiosInstance.delete("/auth/logout")
+            // rails API側のsessionを削除
+            const res = await serverAxiosInstance.delete("/auth/logout");
             if (res.status !== 200) console.log("cookie.user_idが削除出来ていません。");
+            // ブラウザ側に保存しているcookieを削除
+            (await cookies()).delete('_care_loop_session');
+
             await signOut({ redirectTo: '/top' });
           }}
         >

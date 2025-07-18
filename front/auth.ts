@@ -4,6 +4,7 @@ import Line from "next-auth/providers/line"
 import { serverAxiosInstance } from "./lib/axiosInstance/server"
 import { z } from "zod";
 import { cookies } from "next/headers";
+import setCookieParser, { Cookie as ParsedCookie } from "set-cookie-parser";
 
 
 const authDataSchema = z.object({
@@ -123,25 +124,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
         if(account && account.provider === "line") {
           try {
 
-            const role = (await cookies()).get("role")
+            const cookieStore = await cookies();
+
+            // cookieからroleを取得、userに代入
+            const role = cookieStore.get("role");
             console.log( "roleの値をチェック!!",role)
             if (!role) return false;
             user.role = role.value;
-            // cookie取得後、即削除
+            // 即削除
             (await cookies()).delete("role")
-
-            // パラメータからどのボタンからログインしたか取得する
-            // console.log("reqチェック前")
-            // if(!req) return false
-            // // const url = new URL(req.url ?? "", "http://localhost:3000")
-            // const url = new URL(req.url)
-            // console.log("生成されたurlのチェック", url)
-            // const getRole = url.searchParams.get("role")
-
-            // console.log("getRole取得できているかチェック前", getRole)
-            // if(!getRole) return false
-            // user.role = getRole
-            // console.log("user.role代入後", user.role)
            
 
             const res = await serverAxiosInstance.post("/auth/line", {
@@ -152,27 +143,48 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
                 role: user.role,
               }
             })
-
-            // set-cookie戻り値を確認
-            // console.log("set-cookieの戻りを確認!!",res.headers["set-cookie"])
-            console.log("set-cookieの戻りを確認!!",res.headers)
   
             if (![200, 201].includes(res.status)) {
               console.error("ユーザー検証に失敗しました。")
               return false;
             }
 
-            // session_cookieをブラウザcookieに転送
-  
-            console.log("レスポンスデータ！！！！", res.data)
-            const data: AuthData = authDataSchema.parse(res.data);
+            // session_cookieをブラウザcookieに転送(初回時に、cookie転送しとけば、2回目以降のreqでcookieからuser_id取得可能になる)
+            // console.log("set-cookieの戻りを確認!!",res.headers)
+            console.log("set-cookieの戻りを確認!!", res.headers["set-cookie"])
+            const rawSetCookie = res.headers["set-cookie"];
+            
+            if (rawSetCookie) {
+              const parsed: ParsedCookie[] = setCookieParser(rawSetCookie, { map: false });
 
+              for (const c of parsed) {
+                // 環境毎に分岐（本番: None + Secure, 開発: Lax）
+                const secure = process.env.NODE_ENV === "production";
+                const sameSite = secure ? "none" : "lax";
+  
+                // ブラウザcookieに、set-cookieをセット
+                cookieStore.set(c.name, c.value, {
+                  // path...どのドメインでのreq時にも、cookieを送信可能にする為ルートに設定
+                  path: c.path ?? "/",
+                  httpOnly: c.httpOnly,
+                  secure,
+                  sameSite: sameSite,
+                });
+              }
+            } else {
+              console.error("Rails レスポンスに Set-Cookie ヘッダーがありません。");
+            };
+
+            
             // userオブジェクトに、UIロジックに必要になるデータを格納
-            user.provider = data.user.provider,
+            console.log("レスポンスデータ！！！！", res.data);
+            const data: AuthData = authDataSchema.parse(res.data);
+            user.provider = data.user.provider
             user.partner_id = data.user.profile.partner_id
 
             return true;
   
+
           } catch (error) {
             // 例外エラー時
             console.error("意図しないエラーが発生しました", error)
