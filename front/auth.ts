@@ -51,7 +51,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
             const rawSetCookie = res.headers["set-cookie"];
             
             if (rawSetCookie) {
-              const parsed: ParsedCookie[] = setCookieParser(rawSetCookie, { map: false });
+              const parsed: ParsedCookie[] = setCookieParser(rawSetCookie, { decodeValues: false, map: false });
 
               for (const c of parsed) {
                 // 環境毎に分岐（本番: None + Secure, 開発: Lax）
