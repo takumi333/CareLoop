@@ -43,8 +43,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
               return null;
             }
   
-            console.log("レスポンスデータですよ！！！！", res.data)
+            console.log("レスポンスデータ！！！！", res.data)
             const data: AuthData = authDataSchema.parse(res.data);
+
+            // set-cookieをブラウザへ転送
+            console.log("set-cookieの戻りを確認!!", res.headers["set-cookie"])
+            const rawSetCookie = res.headers["set-cookie"];
+            
+            if (rawSetCookie) {
+              const parsed: ParsedCookie[] = setCookieParser(rawSetCookie, { map: false });
+
+              for (const c of parsed) {
+                // 環境毎に分岐（本番: None + Secure, 開発: Lax）
+                const secure = process.env.NODE_ENV === "production";
+                const sameSite = secure ? "none" : "lax";
+  
+                // ブラウザcookieに、set-cookieをセット
+                (await cookies()).set(c.name, c.value, {
+                  // path...どのドメインでのreq時にも、cookieを送信可能にする為ルートに設定
+                  path: c.path ?? "/",
+                  httpOnly: c.httpOnly,
+                  secure,
+                  sameSite: sameSite,
+                });
+              }
+            } else {
+              console.error("Rails レスポンスに Set-Cookie ヘッダーがありません。");
+            };
   
             return {
               // userオブジェクトにセットするidの値を見直しする！！！！！
@@ -155,7 +180,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
             const rawSetCookie = res.headers["set-cookie"];
             
             if (rawSetCookie) {
-              const parsed: ParsedCookie[] = setCookieParser(rawSetCookie, { map: false });
+              // decodeValues: falseにしないと、(parse時 + cookie格納時)の2重デコードになり「cookieの値が変形して破損する」
+              const parsed: ParsedCookie[] = setCookieParser(rawSetCookie, { decodeValues: false, map: false });
 
               for (const c of parsed) {
                 // 環境毎に分岐（本番: None + Secure, 開発: Lax）
