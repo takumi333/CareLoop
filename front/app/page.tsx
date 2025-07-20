@@ -1,11 +1,10 @@
 import Image from "next/image";
+import Top from "./top/page";
 
 
-export default function Top() {
+export default function Home() {
   
   return (
-    // topページに遷移させる
-    <div>ルートページです。</div>
-     
+    <Top />
   );
 }

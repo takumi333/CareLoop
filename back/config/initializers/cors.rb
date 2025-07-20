@@ -10,7 +10,9 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
     origins '127.0.0.1:4000', 'localhost:4000', "care-loop-brown.vercel.app"
 
     resource "*",
-      headers: :any,
-      methods: [:get, :post, :put, :patch, :delete, :options, :head]
+    headers: :any,
+    methods: [:get, :post, :put, :patch, :delete, :options, :head],
+    credentials: true
+
   end
 end

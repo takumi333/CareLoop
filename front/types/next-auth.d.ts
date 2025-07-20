@@ -19,6 +19,7 @@ declare module "next-auth" {
     name: string
     provider?: string
     role: string
+    partner_id?: number
   }
 }
 
@@ -29,5 +30,6 @@ declare module "next-auth/jwt" {
     name: string
     provider?: string
     access_token?: string
+    role: string
   }
 }

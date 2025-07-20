@@ -9,8 +9,6 @@ class Api::V1::Auth::GuestSessionsController < ApplicationController
       user = GuestSignup.call
       session[:user_id] = user.id
       # auth APIで、userオブジェクト作成する為、DBを渡す
-      p "下記は、最終的に返り値として返すuserデータだよ!!!"
-      p user
       render json: user, status: :created
     else
       log_info('body: providerが不足しています。', payload: req_data)
