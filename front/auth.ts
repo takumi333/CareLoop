@@ -72,10 +72,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
             };
   
             return {
-              // userオブジェクトにセットするidの値を見直しする！！！！！
-              // ここでのuser.idは、nextauth側で格納するデータのidを指す為、uidやsubをidに格納した方が良い
+              // credentailsプロバイダーは、自分でid生成する必要ありの為、代入
               id: data.user.id,
               uid: data.user.uid,
+              // sessionのuser_idの値
+              user_id: data.user.id,
               name: data.user.name,
               provider: data.user.provider,
               role: data.user.role,
@@ -116,7 +117,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
       async jwt({ account, token, user}) {
         if (user) {
           token.id = user.id;          
-          token.uid = user.uid; 
+          token.uid = user.uid;
+          // sessionのuser_idの値
+          token.user_id = user.user_id; 
           token.name = user.name;
           token.provider = user.provider;
           token.role = user.role;
@@ -136,7 +139,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
       async session({ session, token }) {
         if (session.user) { 
           session.user.id = token.id;        
-          session.user.uid = token.uid as string; 
+          session.user.uid = token.uid as string;
+          // sessionのuser_idの値
+          session.user.user_id = token.user_id as string;
           session.user.name = token.name;
           session.user.provider = token?.provider;
           session.user.access_token = token.role;
@@ -205,6 +210,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
             // userオブジェクトに、UIロジックに必要になるデータを格納
             console.log("レスポンスデータ！！！！", res.data);
             const data: AuthData = authDataSchema.parse(res.data);
+            user.user_id = data.user.id;
             user.provider = data.user.provider
             user.partner_id = data.user.profile.partner_id
 
