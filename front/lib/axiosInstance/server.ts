@@ -11,12 +11,12 @@ serverAxiosInstance.interceptors.request.use(async config => {
   const cookie = (await cookies()).get('_care_loop_session')
     
   if (cookie) {
-    console.log("取得cookie名を表示!!",cookie.name)
-    console.log("取得cookieの値を表示!!", cookie.value)
+    // console.log("取得cookie名を表示!!",cookie.name)
+    // console.log("取得cookieの値を表示!!", cookie.value)
     const cookieHeader = `${cookie.name}=${cookie.value}`;
 
     config.headers.Cookie = cookieHeader
-    console.log("ヘッダーにセットしたcookieを確認", config.headers.Cookie)
+    // console.log("ヘッダーにセットしたcookieを確認", config.headers.Cookie)
   }
    
   return config;
