@@ -14,13 +14,12 @@ export const serverAxiosInstance = axios.create({
   baseURL: resolveBaseURL(),
   timeout: 5000,
   headers: { "Content-Type": "application/json" },
-  // withCredentials: true,
 });
 
 
 serverAxiosInstance.interceptors.request.use(async config => {
   // サーバー処理は、手動でreqヘッダーにcookieセットしないと、ユーザー検証出来ない
-  // ※interceptors 内で必ず cookies() を再取して、毎リクエスト値が変わる仕様に。
+  // ※必ずcookieを再取して、毎リクエスト値が変える
   // →Nextのサーバー側モジュールはプロセス内で使い回しの為、毎回呼び出ししないと、インターセプタが固定されて、他人のcookie情報が送信される事故が起きる
 
   const cookie = (await cookies()).get('_care_loop_session')
