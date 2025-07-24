@@ -17,6 +17,8 @@ class ApplicationController < ActionController::API
   end
             
   def verify_session_user
+    p "session届いているか確認"
+    p session[:user_id]
     return unless session[:user_id]
 
     user = fetch_user(session[:user_id])

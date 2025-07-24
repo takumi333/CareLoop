@@ -16,7 +16,8 @@ Rails.application.routes.draw do
         post   'line',  to: 'line_sessions#create'
         delete 'logout', to: 'sessions#destroy'
       end
-      resources :users, only: %i[create] 
+      resources :users, only: %i[create]
+      resources :profiles, only: %i[show edit update]
     end
   end
 end
