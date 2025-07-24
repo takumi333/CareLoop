@@ -1,7 +1,22 @@
-import coreAxiosInstance from "./core";
-import { cookies } from 'next/headers'
+import { cookies } from 'next/headers';
+import axios from "axios";
 
-export const serverAxiosInstance = coreAxiosInstance;
+
+const resolveBaseURL = () => {
+  if (process.env.NODE_ENV === "development") {
+    return `http://back:3000/api/v1`;
+  } else {
+    return `${process.env.NEXT_PUBLIC_BASE_API_URL}/api/v1`;
+  }
+}
+
+export const serverAxiosInstance = axios.create({
+  baseURL: resolveBaseURL(),
+  timeout: 5000,
+  headers: { "Content-Type": "application/json" },
+  // withCredentials: true,
+});
+
 
 serverAxiosInstance.interceptors.request.use(async config => {
   // サーバー処理は、手動でreqヘッダーにcookieセットしないと、ユーザー検証出来ない

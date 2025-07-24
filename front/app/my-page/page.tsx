@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import Image from "next/image";
 import Link from 'next/link';
+import NameInlineEditor from '../components/my-page/NameInlineEditor';
 
 
 const MyPage = async () => {
@@ -47,25 +48,22 @@ const MyPage = async () => {
           </p>
         </CardHeader>
 
-        <CardContent className="space-y-2">
-          <div className='flex justify-center gap-1'>
-            <span className="font-medium text-muted-foreground">名前：</span>
-            {profile.user.name}
-            <div className='ml-3'>
-              <Button size= "sm">
-                <Link href={`/my-page/${sessionId}/edit`}>名前を変更する</Link>
-              </Button>
+        <CardContent className="flex justify-center">
+          <div className="w-full max-w-md">
+            <div className="grid grid-cols-[8rem_1fr] gap-y-2 gap-x-3 items-center">
+
+              <span className="text-muted-foreground text-right font-medium">名前:</span>
+              <div className="flex items-center gap-2">
+                <span>{profile.user.name}</span>
+                <NameInlineEditor />
+              </div>
+
+              <span className="text-muted-foreground text-right font-medium">パートナーID:</span>
+              <span>{profile.partner_id}</span>
+
+              <span className="text-muted-foreground text-right font-medium">区分:</span>
+              <span>{profile.user.role}</span>
             </div>
-          </div>
-          <div className='flex justify-center  gap-1'>
-            <span className="font-medium text-muted-foreground">
-              パートナーID:
-            </span>
-            {profile.partner_id}
-          </div>
-          <div className='flex justify-center gap-1'>
-            <span className="font-medium text-muted-foreground">区分：</span>
-            {profile.user.role}
           </div>
         </CardContent>
       </Card>

@@ -6,11 +6,14 @@ class Api::V1::ProfilesController < ApplicationController
   end
 
   def edit
-    p "editアクションに届いてる"
+    render json: { name: current_user.profile.name }, status: :ok
   end
 
   def update
+    params = profile_params
+    p "params"
     p "updateアクションに届いてる"
+    render status: :ok
   end
 
   private
