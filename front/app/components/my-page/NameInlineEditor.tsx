@@ -20,6 +20,7 @@ import { clientAxiosInstance } from '@/lib/axiosInstance/client'
 import { useSession } from 'next-auth/react'
 import Loading from '@/app/loading'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 
 
@@ -27,10 +28,14 @@ import Link from 'next/link'
 
 const NameInlineEditor = () => {
   const [editing, setEditing] = useState(false);
+  const router = useRouter()
+  const { data, status: sessionStatus } = useSession();
 
-  const renameHandler = () => {
-    setEditing(true);
-  }
+
+  if (sessionStatus === "loading") return <Loading />;
+  const sessionId = data?.user.user_id;
+
+
 
 
   const formSchema = z.object({
@@ -50,20 +55,21 @@ const NameInlineEditor = () => {
 
 
 
-  const { data, status } = useSession();
-  if (status === "loading") return <Loading />;
-  const sessionId = data?.user.user_id;
+  const renameHandler = () => {
+    setEditing(true);
+  }
   
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
     // my-pageに記載しているaxiosSSRが実行されると、「フルページ更新」にならない？
     // やっぱり、SWRを使用して、更新処理後、mutateを使用して、SWRにて取得させた方が、最新状態での、CSR的な部分更新としてUI表示にならないか？
-    // res.dataに型定義をして、
-    const res = await clientAxiosInstance.patch(`/profiles/${sessionId}`, {name: value.username});
-    console.log(res)
-    // resが、status:okか検証
-    // my-pageに遷移
+      const res = await clientAxiosInstance.patch(`/profiles/${sessionId}`, {name: value.username});
+      if( res.status !== 200) throw new Error("statusに不備があります。");
+      console.log("フォームonSubmitのpatch処理戻り値を確認 & 今からrefresh", res);
+      // refreshではSSRが実行される。SWRでキャッシュ+更新処理の最後にmutate()を実行で、キャッシュ更新して、CSRコンポーネントだけ更新という状態にできないか？
+      // そうなると、SSR初期フェッチと、SWRでのキャッシュ作成のための初期取得の2重フェッチが走ることになるがどうする？
+      router.refresh();
+      
 
-    // console.log(value)
   }
 
   return (

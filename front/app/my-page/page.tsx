@@ -19,7 +19,7 @@ const MyPage = async () => {
   
   const res = await serverAxiosInstance.get(`/profiles/${sessionId}`);
   const profile = res.data.profile;
-  console.log(profile);
+  // console.log(profile);
 
 
   return (

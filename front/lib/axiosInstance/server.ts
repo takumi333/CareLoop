@@ -30,7 +30,7 @@ serverAxiosInstance.interceptors.request.use(async config => {
     const cookieHeader = `${cookie.name}=${cookie.value}`;
 
     config.headers.Cookie = cookieHeader
-    // console.log("ヘッダーにセットしたcookieを確認", config.headers.Cookie)
+    console.log("ヘッダーにセットしたcookieを確認", config.headers.Cookie)
   }
    
   return config;

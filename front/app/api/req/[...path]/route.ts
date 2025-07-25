@@ -23,13 +23,22 @@ const handler = async (req: NextRequest, context: { params: Promise<{ path: stri
       method,
       data,
     });
+
   
     const nextRes = new NextResponse(res.data, {
       status: res.status,
       headers: res.headers as any,
     });
 
-    return res;
+    // 新規で送られてきたset-cookieを再度ブラウザに転送する(Railsでreset_sessionを毎回して、新規session-IDローテーションして、cookieの悪用を防止。だから新しくcookieをセットしないといけない)
+    // const setCookie = res.headers["set-cookie"];
+    // //  setCookieの型を、string[]から、stringに変換する必要がある
+    // if(typeof setCookie === "undefined") return;
+    // setCookie.forEach(v => nextRes.headers.append("set-cookie", v));
+    
+
+    console.log("nextResのset-cookieを確認する", nextRes)
+    return nextRes;
 
   } catch (error) {
 
