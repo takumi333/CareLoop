@@ -93,6 +93,11 @@ const MyPage = async () => {
           </div>
         </CardContent>
       </Card>
+      <div className='flex justify-center w-full'>
+        <Button>
+          <Link href="/dashboard">ダッシュボードへ戻る</Link>
+        </Button>
+      </div>
     </div>
   )
 }

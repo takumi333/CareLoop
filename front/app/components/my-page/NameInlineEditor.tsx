@@ -28,7 +28,7 @@ import { Input } from "@/components/ui/input"
 const NameInlineEditor = ({ userId }: { userId: string }) => {
   const [editing, setEditing] = useState(false);
   const { profileData, isError, isLoading, mutate } = useProfile(userId);
-  console.log(profileData);
+  console.log("テストテスト",profileData);
 
 
   const formSchema = z.object({
@@ -47,8 +47,8 @@ const NameInlineEditor = ({ userId }: { userId: string }) => {
   })
 
 
-
   const renameHandler = () => {
+    form.reset({ username: "" })
     setEditing(true);
   }
   
@@ -58,6 +58,7 @@ const NameInlineEditor = ({ userId }: { userId: string }) => {
       const newName = res.data.profile.name;
       if (!profileData)  { throw new Error("キャッシュを更新できませんでした。") };
       mutate({ profile: {...profileData.profile, name: newName }}, { revalidate: false });
+      setEditing(false);
 
     } catch (error) {
 
