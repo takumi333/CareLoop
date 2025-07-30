@@ -43,11 +43,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
               return null;
             }
   
-            console.log("レスポンスデータ！！！！", res.data)
+            // console.log("レスポンスデータ！！！！", res.data)
             const data: AuthData = authDataSchema.parse(res.data);
 
             // set-cookieをブラウザへ転送
-            console.log("set-cookieの戻りを確認!!", res.headers["set-cookie"])
+            // console.log("set-cookieの戻りを確認!!", res.headers["set-cookie"])
             const rawSetCookie = res.headers["set-cookie"];
             
             if (rawSetCookie) {
@@ -158,7 +158,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
 
             // cookieからroleを取得、userに代入
             const role = cookieStore.get("role");
-            console.log( "roleの値をチェック!!",role)
+            // console.log( "roleの値をチェック!!",role)
             if (!role) return false;
             user.role = role.value;
             // 即削除
@@ -181,7 +181,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
 
             // session_cookieをブラウザcookieに転送(初回時に、cookie転送しとけば、2回目以降のreqでcookieからuser_id取得可能になる)
             // console.log("set-cookieの戻りを確認!!",res.headers)
-            console.log("set-cookieの戻りを確認!!", res.headers["set-cookie"])
+            // console.log("set-cookieの戻りを確認!!", res.headers["set-cookie"])
             const rawSetCookie = res.headers["set-cookie"];
             
             if (rawSetCookie) {
@@ -208,7 +208,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
 
             
             // userオブジェクトに、UIロジックに必要になるデータを格納
-            console.log("レスポンスデータ！！！！", res.data);
+            // console.log("レスポンスデータ！！！！", res.data);
             const data: AuthData = authDataSchema.parse(res.data);
             user.user_id = data.user.id;
             user.provider = data.user.provider

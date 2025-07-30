@@ -24,7 +24,7 @@ class ApplicationController < ActionController::API
     user = fetch_user(session[:user_id])
     return unless user&.active?
 
-    reset_session  # セッション固定攻撃対策で、セッションIDを更新する
+    reset_session  # セッション固定攻撃対策で、不備がなくても、セッションIDを更新する
     session[:user_id] = user.id
     user
   end

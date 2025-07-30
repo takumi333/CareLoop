@@ -3,13 +3,17 @@ import { auth } from '@/auth';
 import { serverAxiosInstance } from '@/lib/axiosInstance/server'
 import Loading from '../loading';
 import { UserRound } from 'lucide-react';
+import { SWRConfig } from 'swr'
+import NameInlineEditor from '../components/my-page/NameInlineEditor';
+
+
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import Image from "next/image";
 import Link from 'next/link';
-import NameInlineEditor from '../components/my-page/NameInlineEditor';
+
 
 
 const MyPage = async () => {
@@ -17,9 +21,13 @@ const MyPage = async () => {
   if (!session) return <Loading />;
   const sessionId = session.user.user_id;
   
+
+
   const res = await serverAxiosInstance.get(`/profiles/${sessionId}`);
-  const profile = res.data.profile;
-  console.log(profile);
+  const profile = res.data;
+  const { partner_id, user: { role }} = profile.profile;
+  console.log("取得データのチェック", profile)
+
 
 
   return (
@@ -30,8 +38,7 @@ const MyPage = async () => {
           <div className="relative h-24 w-24">
             <Image
               src={
-                profile.avatarUrl ??
-                <UserRound />
+                "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItcm91bmQtaWNvbiBsdWNpZGUtdXNlci1yb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSI4IiByPSI1Ii8+PHBhdGggZD0iTTIwIDIxYTggOCAwIDAgMC0xNiAwIi8+PC9zdmc+"
               }
               alt="プロフィール画像"
               fill
@@ -54,15 +61,16 @@ const MyPage = async () => {
 
               <span className="text-muted-foreground text-right font-medium">名前:</span>
               <div className="flex items-center gap-2">
-                <span>{profile.user.name}</span>
-                <NameInlineEditor />
+                <SWRConfig value={{ fallback: {[`/profiles/${sessionId}`]: profile}}}>
+                  <NameInlineEditor userId={sessionId}/>
+                </SWRConfig>
               </div>
 
               <span className="text-muted-foreground text-right font-medium">パートナーID:</span>
-              <span>{profile.partner_id}</span>
+              <span>{partner_id}</span>
 
               <span className="text-muted-foreground text-right font-medium">区分:</span>
-              <span>{profile.user.role}</span>
+              <span>{role}</span>
             </div>
           </div>
         </CardContent>
