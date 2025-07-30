@@ -1,6 +1,8 @@
 import { serverAxiosInstance } from "@/lib/axiosInstance/server";
 import { NextRequest, NextResponse } from "next/server";
 import type { Method } from "axios";
+import { cookies } from "next/headers";
+import setCookieParser, { Cookie as ParsedCookie } from "set-cookie-parser";
 
 
 const handler = async (req: NextRequest, context: { params: Promise<{ path: string[] }> }) => {
@@ -24,19 +26,39 @@ const handler = async (req: NextRequest, context: { params: Promise<{ path: stri
       data,
     });
 
-  
-    const nextRes = new NextResponse(res.data, {
+
+    const nextRes = NextResponse.json(res.data, {
       status: res.status,
-      headers: res.headers as any,
+      // headers: res.headers as any,
     });
 
-    // 新規で送られてきたset-cookieを再度ブラウザに転送する(Railsでreset_sessionを毎回して、新規session-IDローテーションして、cookieの悪用を防止。だから新しくcookieをセットしないといけない)
-    // const setCookie = res.headers["set-cookie"];
-    // //  setCookieの型を、string[]から、stringに変換する必要がある
-    // if(typeof setCookie === "undefined") return;
-    // setCookie.forEach(v => nextRes.headers.append("set-cookie", v));
-    
 
+    // 新規で送られてきたset-cookieを再度ブラウザに転送する
+    const rawSetCookie = res.headers["set-cookie"];
+            
+    if (rawSetCookie) {
+      // decodeValues: falseにしないと、(parse時 + cookie格納時)の2重デコードになり「cookieの値が変形して破損する」
+      const parsed: ParsedCookie[] = setCookieParser(rawSetCookie, { decodeValues: false, map: false });
+
+      for (const c of parsed) {
+        nextRes.cookies.set({
+          name: c.name,
+          value: c.value,
+          // path...どのドメインでのreq時にも、cookieを送信可能にする為ルートに設定
+          path: c.path ?? "/",
+          httpOnly: c.httpOnly,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+          expires:  c.expires,
+        });
+      }
+
+     } else {
+       console.error("Rails レスポンスに Set-Cookie ヘッダーがありません。");
+     };
+  
+    
+    
     console.log("nextResのset-cookieを確認する", nextRes)
     return nextRes;
 

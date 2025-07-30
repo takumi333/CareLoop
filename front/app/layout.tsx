@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import { SessionProvider } from "next-auth/react";
+import { ToastContainer } from 'react-toastify';
 // import UserIdProvider from "./providers/UserIdProvider";
 
 const geistSans = Geist({
@@ -34,6 +35,7 @@ export default function RootLayout({
         {/* <UserIdProvider> */}
         <SessionProvider>
           <Header/>
+          <ToastContainer />
             <main className="flex-grow">
               {children}
             </main>

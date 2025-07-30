@@ -4,6 +4,13 @@ import React, { useEffect, useState } from 'react'
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
+import { toast } from 'react-toastify';
+import { clientAxiosInstance } from '@/lib/axiosInstance/client'
+import Loading from '@/app/loading'
+import { Profile, RapProfile } from '@/types'
+import { useProfile } from '@/hooks/useProfile'
+
+
 
 import { Button } from "@/components/ui/button"
 import {
@@ -16,26 +23,12 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { clientAxiosInstance } from '@/lib/axiosInstance/client'
-import { useSession } from 'next-auth/react'
-import Loading from '@/app/loading'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 
-
-// type profileProps = { name :string }
-
-const NameInlineEditor = () => {
+const NameInlineEditor = ({ userId }: { userId: string }) => {
   const [editing, setEditing] = useState(false);
-  const router = useRouter()
-  const { data, status: sessionStatus } = useSession();
-
-
-  if (sessionStatus === "loading") return <Loading />;
-  const sessionId = data?.user.user_id;
-
-
+  const { profileData, isError, isLoading, mutate } = useProfile(userId);
+  console.log(profileData);
 
 
   const formSchema = z.object({
@@ -60,41 +53,62 @@ const NameInlineEditor = () => {
   }
   
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
-    // my-pageに記載しているaxiosSSRが実行されると、「フルページ更新」にならない？
-    // やっぱり、SWRを使用して、更新処理後、mutateを使用して、SWRにて取得させた方が、最新状態での、CSR的な部分更新としてUI表示にならないか？
-      const res = await clientAxiosInstance.patch(`/profiles/${sessionId}`, {name: value.username});
-      if( res.status !== 200) throw new Error("statusに不備があります。");
-      console.log("フォームonSubmitのpatch処理戻り値を確認 & 今からrefresh", res);
-      // refreshではSSRが実行される。SWRでキャッシュ+更新処理の最後にmutate()を実行で、キャッシュ更新して、CSRコンポーネントだけ更新という状態にできないか？
-      // そうなると、SSR初期フェッチと、SWRでのキャッシュ作成のための初期取得の2重フェッチが走ることになるがどうする？
-      router.refresh();
-      
+    try {
+      const res = await clientAxiosInstance.patch<RapProfile>(`/profiles/${userId}`, {name: value.username});
+      const newName = res.data.profile.name;
+      if (!profileData)  { throw new Error("キャッシュを更新できませんでした。") };
+      mutate({ profile: {...profileData.profile, name: newName }}, { revalidate: false });
 
+    } catch (error) {
+
+      // mutate処理以外でエラーが発生した場合のエラーハンドリング
+      toast.error("データ取得に失敗しました", {
+        toastId: customId
+      });
+    }
   }
+
+
+  // ロード中&エラー時のハンドリング
+  const customId = "custom-id-yes";
+  useEffect(() => {
+    if (isError) toast.error("データ取得に失敗しました", {
+          toastId: customId
+        });
+        console.log("SWR fetcher error:", isError);
+  }, [isError]);
+
+  if (isLoading) return  <Loading />
+
+
 
   return (
     <>
       {!editing ? 
-          <div>
-            <Button size= "sm" onClick={renameHandler}>名前を変更する</Button>
-          </div>
+        <>
+          <span>{profileData?.profile.name}</span>
+          <Button size= "sm" onClick={renameHandler}>名前を変更する</Button>
+        </>
+          
       :
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-center gap-2">
             <FormField
               control={form.control}
               name="username"
               render={({ field }) => (
-                <FormItem className='flex items-center gap-2'>
-                  <FormLabel className='text-base'>新しい名前: </FormLabel>
-                  <FormControl>
-                    <Input className='w-1/2' placeholder="名前を入力してください" {...field} />
-                  </FormControl>
-                  <FormMessage />
+                <FormItem>
+                  <div className="flex items-center gap-2">
+                    {/* <FormLabel className='text-base'>新しい名前: </FormLabel> */}
+                    <FormControl>
+                      <Input className='w-full' placeholder="名前を入力してください" {...field} />
+                    </FormControl>
+                    <Button type="submit">Submit</Button>
+                  </div>
+                  <FormMessage className="mt-1 text-red-500"/>
                 </FormItem>
               )}
             />
-            <Button type="submit">Submit</Button>
           </form>
         </Form>
       }
