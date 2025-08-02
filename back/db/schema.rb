@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_06_25_083430) do
+ActiveRecord::Schema[7.2].define(version: 2025_07_31_080901) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,6 +42,16 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_25_083430) do
     t.datetime "updated_at", null: false
     t.index ["message_id"], name: "index_messages_reads_on_message_id"
     t.index ["reader_id"], name: "index_messages_reads_on_reader_id"
+  end
+
+  create_table "nicknames", force: :cascade do |t|
+    t.bigint "user_relation_id", null: false
+    t.bigint "rename_user_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_relation_id", "rename_user_id"], name: "index_nicknames_on_relation_and_rename_user", unique: true
+    t.index ["user_relation_id"], name: "index_nicknames_on_user_relation_id"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -158,6 +168,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_06_25_083430) do
   add_foreign_key "messages", "users", column: "sender_id"
   add_foreign_key "messages_reads", "messages"
   add_foreign_key "messages_reads", "users", column: "reader_id"
+  add_foreign_key "nicknames", "user_relations"
+  add_foreign_key "nicknames", "users", column: "rename_user_id"
   add_foreign_key "notifications", "comments"
   add_foreign_key "notifications", "messages"
   add_foreign_key "notifications", "user_relations", column: "relation_id"

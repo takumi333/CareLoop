@@ -25,10 +25,9 @@ import {
 import { Input } from "@/components/ui/input"
 
 
-const NameInlineEditor = ({ userId }: { userId: string }) => {
+const ProfileNameEditor = ({ userId }: { userId: string }) => {
   const [editing, setEditing] = useState(false);
-  const { profileData, isError, isLoading, mutate } = useProfile(userId);
-  console.log("テストテスト",profileData);
+  const { profile: profileData, isError, isLoading, mutate } = useProfile(userId);
 
 
   const formSchema = z.object({
@@ -117,4 +116,4 @@ const NameInlineEditor = ({ userId }: { userId: string }) => {
   )
 }
 
-export default NameInlineEditor
+export default ProfileNameEditor

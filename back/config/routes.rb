@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       end
       resources :users, only: %i[create]
       resources :profiles, only: %i[show edit update]
+      resources :user_relations, only: %i[index create update], path: 'user-relations'
     end
   end
 end

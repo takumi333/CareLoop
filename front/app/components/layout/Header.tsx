@@ -5,6 +5,7 @@ import { serverAxiosInstance } from '@/lib/axiosInstance/server'
 import { Menu } from "lucide-react"
 import Link from "next/link"
 import { cookies } from 'next/headers'
+import { mutate } from 'swr';
 
 import React from 'react'
 
@@ -24,6 +25,8 @@ const Header = () => {
             if (res.status !== 200) console.log("cookie.user_idが削除出来ていません。");
             // ブラウザ側に保存しているcookieを削除
             (await cookies()).delete('_care_loop_session');
+            // 全キーのキャッシュをクリア(ユーザー切替時に、前データが瞬間露出するバグ対策)
+            mutate(() => true, undefined, { revalidate: false });
 
             await signOut({ redirectTo: '/top' });
           }}

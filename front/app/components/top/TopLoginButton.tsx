@@ -12,7 +12,7 @@ type Props = {
   role?: "patient" | "home_care_giver" | "medical_personal",
 }
 
-const LoginButton = ({provider, role}: Props) => {
+const TopLoginButton = ({provider, role}: Props) => {
   const Login = async () => {
     console.log("props確認!!",provider, role)
     if (provider === "line" && role) {
@@ -34,4 +34,4 @@ const LoginButton = ({provider, role}: Props) => {
   )
 }
 
-export default LoginButton
+export default TopLoginButton

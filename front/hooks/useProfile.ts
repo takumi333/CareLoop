@@ -19,7 +19,7 @@ export function useProfile(id: string) {
     });
 
   return {
-    profileData: data,
+    profile: data,
     isLoading,
     isError: error,
     mutate,

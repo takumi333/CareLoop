@@ -34,7 +34,7 @@ class User < ApplicationRecord
 
   scope :deleted, -> { where(delete_flag: true)  }
 
-  # ゲストログインの場合のみ実行する条件式を加える
+  # ゲストログインの場合のみ実行する条件式を加える(本当にこの呼び出しで適切か？)
   after_create :build_initial_profile!
 
   def soft_delete
@@ -57,6 +57,7 @@ class User < ApplicationRecord
 
   private
 
+  # profileモデルのクラスメソッドとして定義するべきか？(guest_signupにて、Profileモデルから呼び出すべきでは？(単一責任))
   def build_initial_profile!
     # begin
     build_profile(
