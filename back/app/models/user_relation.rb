@@ -3,9 +3,12 @@ class UserRelation < ApplicationRecord
   belongs_to :requester, class_name: 'User', foreign_key: 'requester_id'
   belongs_to :receiver, class_name: 'User', foreign_key: 'receiver_id'
 
-  # バリデーション(nameとpartner_idの受け入れは、ここのモデルではなくない？)
-  # 
+  # 仮想属性
+  attr_accessor :partner_id, :name
+
+  # バリデーション(名前変更用nameと関係者追加用partner_idのバリデーション)
+  validates :partner_id, presence: true, if: -> {  }
 
   # statusのenum設定
-  
+
 end
