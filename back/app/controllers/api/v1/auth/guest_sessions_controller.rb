@@ -1,5 +1,4 @@
 class Api::V1::Auth::GuestSessionsController < ApplicationController
-  include Loggable
 
   skip_before_action :authenticate_user!, only: %i[create]
 

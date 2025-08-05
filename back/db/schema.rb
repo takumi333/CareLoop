@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_07_31_080901) do
+ActiveRecord::Schema[7.2].define(version: 2025_08_04_113444) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -57,11 +57,11 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_31_080901) do
   create_table "notifications", force: :cascade do |t|
     t.bigint "sender_id", null: false
     t.bigint "recipient_id", null: false
-    t.bigint "comment_id", null: false
-    t.bigint "message_id", null: false
-    t.bigint "relation_id", null: false
+    t.bigint "comment_id"
+    t.bigint "message_id"
+    t.bigint "relation_id"
     t.integer "action", null: false
-    t.boolean "checked", null: false
+    t.boolean "checked", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["comment_id"], name: "index_notifications_on_comment_id"

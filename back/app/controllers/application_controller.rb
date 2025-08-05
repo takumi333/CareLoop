@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::API
   # API モードでも controller から session/cookies を使えるように
   include ActionController::Cookies
+  include Loggable
 
   before_action :authenticate_user! # ゲストログイン, Lineログイン時、current_userスキップコールバック使用
 

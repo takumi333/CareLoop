@@ -18,6 +18,10 @@ import Loading from '@/app/loading';
 import { Pen } from 'lucide-react';
 import { Trash2 } from 'lucide-react';
 import { UserRound } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog"
 
 
 // type relationProps = {
@@ -82,6 +86,17 @@ const RelationsList = ({sessionId}: {sessionId: string}) => {
           <Button variant="outline">戻る</Button>
         </div>
 
+        <Dialog open={isRelationAddFormModal} onOpenChange={setAddFormModal}>
+          <RelationAddForm close={setAddFormModal}/>
+        </Dialog>
+        {/* {isRelationAddFormModal && <RelationAddForm />} */}
+      {/* {isEditNickNameModal && <RelationAddForm />} */}
+
+
+
+
+
+
         <ul className="space-y-4">
           {relationList.map((data: any) => (
             <li key={data.partner_id} className="flex justify-center">
@@ -119,10 +134,7 @@ const RelationsList = ({sessionId}: {sessionId: string}) => {
           ))}
         </ul>
       </div>
-      
-      {isRelationAddFormModal && <RelationAddForm />}
-      {isEditNickNameModal && <RelationAddForm />}
-      
+
     </>
     
   )

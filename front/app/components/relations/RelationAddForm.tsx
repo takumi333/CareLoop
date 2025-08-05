@@ -11,20 +11,23 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-const RelationAddForm = () => {
+const RelationAddForm = ({ close }: { close: (value: React.SetStateAction<boolean>) => void}) => {
+
+  const submitHandler = () => {
+    close(false)
+  }
+
+
   return (
-    <Dialog>
-        <DialogTrigger>Open</DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Are you absolutely sure?</DialogTitle>
-            <DialogDescription>
-              This action cannot be undone. This will permanently delete your account
-               and remove your data from our servers.
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>関係者追加フォーム</DialogTitle>
+          <DialogDescription>
+            関係者に追加したい方のpartner_idを入力して下さい。
+          </DialogDescription>
+        </DialogHeader>
+        {/* フォームをここに作成 */}
+      </DialogContent>
   )
 }
 

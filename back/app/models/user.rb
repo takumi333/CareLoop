@@ -21,8 +21,8 @@ class User < ApplicationRecord
   has_many :shared_schedules
   has_many :schedules, through: :shared_schedules
 
-  enum :provider, { line: 0, guest: 1 }
-  enum :role, { patient: 0, home_care_giver: 1, medical_personal: 2 }
+  enum :provider, [ :line, :guest ]
+  enum :role, [ :patient, :home_care_giver, :medical_personal ]
 
   # freezeで、配列オブジェクトを固定し、実行中に追加・削除できないようにする
   PROVIDERS = %w[line guest].freeze
