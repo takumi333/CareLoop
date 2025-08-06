@@ -7,9 +7,9 @@ class UserRelation < ApplicationRecord
   attr_accessor :partner_id, :name
 
   # バリデーション(名前変更用nameと関係者追加用partner_idのバリデーション)
-  validates :partner_id, presence: true, length: { is: 10 }, on: :create
-  validates :name, presence: true, length: { in: 2..10 }, on: :update
+  # validates :partner_id, presence: true, length: { is: 10 }, on: :create
+  # validates :name, presence: true, length: { in: 2..10 }, on: :update
 
   # statusのenum設定
-  enum :status, [ :pending, :accepted, :rejection ] 
+  enum :status, [ :pending, :accepted, :rejection ], prefix: :status
 end

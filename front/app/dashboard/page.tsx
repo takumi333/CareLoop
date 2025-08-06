@@ -5,7 +5,7 @@ import React from 'react'
 
 const Dashboard = async () => {
   const session = await auth();
-  console.log("sessionでuser_idの値をとれているか確認!!" ,session);
+  // console.log("sessionでuser_idの値をとれているか確認!!" ,session);
   return (
     <>
       <div>ダッシュボードページです。</div> 

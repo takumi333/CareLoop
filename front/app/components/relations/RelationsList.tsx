@@ -49,15 +49,15 @@ type relationList = {
 const RelationsList = ({sessionId}: {sessionId: string}) => {
   const [isRelationAddFormModal, setAddFormModal] = useState(false);
   const [isEditNickNameModal, setEditNickNameModal] = useState(false);
-  // const {profile, isLoading, isError, mutate} = useProfile(sessionId);
   
   const fetcher = (url: string) => clientAxiosInstance.get(url).then(res => res.data);
 
   const {data: relations, error: isError, isLoading, mutate} = useSWR("/user-relations", fetcher);
 
   if(isLoading) return <Loading />;
-  const relationUser = relations.profile;
-  const relationList: Array<relationList> = [relationUser];
+  console.log("relationsチェック: ", relations)
+  // const relationUser = relations.profile;
+  const relationList: Array<relationList> = [relations];
   console.log("relationUserチェック: ", relationList)
 
 
@@ -73,6 +73,15 @@ const RelationsList = ({sessionId}: {sessionId: string}) => {
 
 
 
+  // 関係者が1件もない場合、早期return
+  if (relationList?.length === 0 ) {
+    return (
+      <div className="flex justify-center py-8 text-muted-foreground">
+        まだ関係者リストに追加されていません。
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="mx-auto max-w-4xl space-y-6 px-4 py-8">
@@ -87,13 +96,10 @@ const RelationsList = ({sessionId}: {sessionId: string}) => {
         </div>
 
         <Dialog open={isRelationAddFormModal} onOpenChange={setAddFormModal}>
-          <RelationAddForm close={setAddFormModal}/>
+          <RelationAddForm close={setAddFormModal} mutate={mutate}/>
         </Dialog>
         {/* {isRelationAddFormModal && <RelationAddForm />} */}
       {/* {isEditNickNameModal && <RelationAddForm />} */}
-
-
-
 
 
 
