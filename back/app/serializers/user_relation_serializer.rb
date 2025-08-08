@@ -1,5 +1,6 @@
-class ProfileSerializer < ActiveModel::Serializer
-  attributes :requester_id, :receiver_id, :status, :requested_at, :accepted_at, 
+class UserRelationSerializer < ActiveModel::Serializer
+  attributes :status, :requested_at, :accepted_at
 
-  has_many :profile
+  belongs_to :requester, serializer: UserSerializer
+  belongs_to :receiver,  serializer: UserSerializer
 end

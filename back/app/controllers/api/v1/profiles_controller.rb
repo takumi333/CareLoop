@@ -6,9 +6,8 @@ class Api::V1::ProfilesController < ApplicationController
   end
 
   def update
-    # params = profile_params
     profile = current_user.profile
-    # profile.name = params[:name]
+    
 
     if profile.update(profile_params)
       render json: profile, status: :ok

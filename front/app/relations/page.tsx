@@ -13,7 +13,7 @@ const Relations = async () => {
 
   const res = await serverAxiosInstance.get("/user-relations");
   const relations = res.data;
-  console.log("relationsの値チェック",relations)
+  // console.log("relationsの値チェック",relations)
 
   return (
     <SWRConfig value={{ fallback: {"/user-relations": relations}}}>

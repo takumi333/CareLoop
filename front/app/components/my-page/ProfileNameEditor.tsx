@@ -23,6 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import ErrorView from '../LocalError'
 
 
 const ProfileNameEditor = ({ userId }: { userId: string }) => {
@@ -62,6 +63,7 @@ const ProfileNameEditor = ({ userId }: { userId: string }) => {
     } catch (error) {
 
       // mutate処理以外でエラーが発生した場合のエラーハンドリング
+      const customId = "custom-id-yes";
       toast.error("データ取得に失敗しました", {
         toastId: customId
       });
@@ -70,16 +72,16 @@ const ProfileNameEditor = ({ userId }: { userId: string }) => {
 
 
   // ロード中&エラー時のハンドリング
-  const customId = "custom-id-yes";
-  useEffect(() => {
-    if (isError) toast.error("データ取得に失敗しました", {
-          toastId: customId
-        });
-        console.log("SWR fetcher error:", isError);
-  }, [isError]);
+  // const customId = "custom-id-yes";
+  // useEffect(() => {
+  //   if (isError) toast.error("データ取得に失敗しました", {
+  //         toastId: customId
+  //       });
+  //       console.log("SWR fetcher error:", isError);
+  // }, [isError]);
 
   if (isLoading) return  <Loading />
-
+  if(isError) return <ErrorView onRetry={() => mutate()}/>;
 
 
   return (

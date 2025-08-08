@@ -1,9 +1,8 @@
 class Api::V1::UserRelationsController < ApplicationController
   def index
-    # あとで、関係者取得するロジックに書き直す
-    relations_data = UserRelation.where(requester_id: current_user.id).or( UserRelation.where(receiver_id: current_user.id)).order(requested_at: :desc)
-    log_info('relations_dataの値をチェック!', payload: relations_data)
-    render json: relations_data, status: :ok
+    user_relations = UserRelation.includes(requester: :profile, receiver: :profile).where(requester_id: current_user.id).or( UserRelation.where(receiver_id: current_user.id)).order(requested_at: :desc)
+    # log_info('relations_dataの値をチェック!', payload: user_relations)
+    render json: user_relations, include: ['requester.profile', 'receiver.profile'], status: :ok  #includeオプションで、孫階層まで取得する(user_relation→user→profile)
   end
 
   def create

@@ -18,7 +18,7 @@ const Header = () => {
     // rails&ブラウザのcookieのリセット
     await logoutAction();
     // 全キーのキャッシュをクリア(ユーザー切替時に、前データが瞬間露出するバグ対策)
-    mutate(() => true, undefined, { revalidate: false });
+    await mutate(() => true, undefined, { revalidate: false });
     await signOut({ redirectTo: '/top' });
   };
 

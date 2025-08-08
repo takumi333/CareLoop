@@ -20,31 +20,67 @@ import { Trash2 } from 'lucide-react';
 import { UserRound } from 'lucide-react';
 import {
   Dialog,
-  DialogContent,
 } from "@/components/ui/dialog"
+import ErrorView from '../LocalError';
+import { NewRelations } from '@/types';
+import { ROLE_LABEL, STATUS_LABEL } from '@/lib/labels';
 
 
-// type relationProps = {
-//   profile: {
-//     image: string,
-//     name: string,
-//     role: string,
-//   }
-//   sessionId: string,
+// swrに渡す用に作成し直して、型セット
+// type RelationData = {
+//   user_relations: Array<{
+//     accepted_at: string | null,
+//     requested_at: string,
+//     status: string,
+//     receiver: {
+//       id: number,
+//       name: string,
+//       provider: string,
+//       role: string,
+//       uid: string,
+//       profile: {
+//         image: string,
+//         name: string,
+//         partner_id: number,
+//       }
+//     },
+//     requester: {
+//       id: number,
+//       name: string,
+//       provider: string,
+//       role: string,
+//       uid: string,
+//       profile: {
+//         image: string,
+//         name: string,
+//         partner_id: number,
+//       }
+//     }
+//   }>;
 // }
 
-type relationList = {
-  image: string,
-  partner_id: number,
+type Profile = { image: string; name: string; partner_id: number };
+
+type LiteUser = {
+  id: number,
   name: string,
-  user: {
-    id: number,
-    name: string,
-    provider: string,
-    role: string,
-    uid: string
-  }
-}
+  provider: string,
+  role: string,
+  uid: string,
+  profile: Profile,
+};
+
+type UserRelation = {
+  accepted_at: string | null,
+  requested_at: string,
+  status: "pending" | "accepted" | "rejected",
+  receiver: LiteUser,
+  requester: LiteUser,
+};
+
+type RelationData = { user_relations: UserRelation[] };
+
+
 
 const RelationsList = ({sessionId}: {sessionId: string}) => {
   const [isRelationAddFormModal, setAddFormModal] = useState(false);
@@ -52,14 +88,24 @@ const RelationsList = ({sessionId}: {sessionId: string}) => {
   
   const fetcher = (url: string) => clientAxiosInstance.get(url).then(res => res.data);
 
-  const {data: relations, error: isError, isLoading, mutate} = useSWR("/user-relations", fetcher);
+  const {data: relations, error: isError, isLoading, mutate} = useSWR<RelationData>("/user-relations", fetcher);
+  // console.log("relationsチェック",relations)
 
-  if(isLoading) return <Loading />;
-  console.log("relationsチェック: ", relations)
-  // const relationUser = relations.profile;
-  const relationList: Array<relationList> = [relations];
-  console.log("relationUserチェック: ", relationList)
+  
+  
+  // console.log("relationsチェック: ", relations)
+  // UIで必要な値のみを抽出
+  const newRelations: Array<NewRelations> = relations?.user_relations.map((relation: any) => {
+    const partner = relation.requester.id === Number(sessionId) ? relation.receiver : relation.requester;
 
+    return {
+      partner_id: partner.id,
+      image: partner.image,
+      name: partner.profile.name,
+      role: partner.role,
+      status: relation.status
+    }
+  }) ?? [] as Array<NewRelations>;
 
 
 
@@ -71,54 +117,52 @@ const RelationsList = ({sessionId}: {sessionId: string}) => {
     setAddFormModal(true);
   }
 
+  if(isLoading) return <Loading />;
+  if(isError) return <ErrorView onRetry={() => mutate()}/>;
 
-
-  // 関係者が1件もない場合、早期return
-  if (relationList?.length === 0 ) {
-    return (
-      <div className="flex justify-center py-8 text-muted-foreground">
-        まだ関係者リストに追加されていません。
-      </div>
-    );
-  }
 
   return (
-    <>
-      <div className="mx-auto max-w-4xl space-y-6 px-4 py-8">
-        {/* ヘッダー */}
-        <div className="pt-4 flex justify-center w-full font-bold text-2xl border-b-2">
-          <h1>関係者リスト</h1>
+    <div className="mx-auto max-w-4xl space-y-6 px-4 py-8">
+      <div className="pt-4 flex justify-center w-full font-bold text-2xl border-b-2">
+        <h1>関係者リスト</h1>
+      </div>
+
+      <div className="flex justify-end space-x-2">
+        <Button onClick={relationAddFormModalHandler}>関係者を追加</Button>
+        <Button variant="outline">戻る</Button>
+      </div>
+
+      <Dialog open={isRelationAddFormModal} onOpenChange={setAddFormModal}>
+        <RelationAddForm close={setAddFormModal} mutate={mutate}/>
+      </Dialog>
+
+      {/* 関係者リストが1件以上存在するか分岐 */}
+      {newRelations.length === 0 ? (
+        <div className="flex justify-center py-8 text-muted-foreground">
+          まだ関係者リストに追加されていません。
         </div>
-
-        <div className="flex justify-end space-x-2">
-          <Button onClick={relationAddFormModalHandler}>関係者を追加</Button>
-          <Button variant="outline">戻る</Button>
-        </div>
-
-        <Dialog open={isRelationAddFormModal} onOpenChange={setAddFormModal}>
-          <RelationAddForm close={setAddFormModal} mutate={mutate}/>
-        </Dialog>
-        {/* {isRelationAddFormModal && <RelationAddForm />} */}
-      {/* {isEditNickNameModal && <RelationAddForm />} */}
-
-
-
+      ) : (
         <ul className="space-y-4">
-          {relationList.map((data: any) => (
-            <li key={data.partner_id} className="flex justify-center">
+          {newRelations.map((rel) => (
+            <li key={rel.partner_id} className="flex justify-center">
               <Card className="w-3/4">
                 <CardContent className="flex items-center space-x-4 p-4">
  
                   <div >
-                    {data.image ? data.image : <UserRound size={80} className="rounded-full bg-muted object-cover" /> }
+                    {rel.image ? rel.image : <UserRound size={80} className="rounded-full bg-muted object-cover" /> }
                   </div>
 
                   <div className="flex-1">
-                    <p className="text-lg font-semibold text-gray-800">
-                      {data.name}
-                    </p>
+                    <div className="flex gap-1 text-lg font-semibold ">
+                      <div className='text-gray-800'>
+                        {rel.name}
+                      </div>
+                      <div className=" px-2 py-0.5 text-sm text-yellow-800">
+                       ({STATUS_LABEL[rel.status]})
+                      </div>
+                    </div>
                     <span className="inline-block mt-1 px-2 py-0.5 text-sm font-medium bg-green-100 text-green-800 rounded">
-                      {data.user.role}
+                      {ROLE_LABEL[rel.role]}
                     </span>
                   </div>
 
@@ -139,10 +183,8 @@ const RelationsList = ({sessionId}: {sessionId: string}) => {
             </li>
           ))}
         </ul>
-      </div>
-
-    </>
-    
+      )}
+    </div> 
   )
 }
 
