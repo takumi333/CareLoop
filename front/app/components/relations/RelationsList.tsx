@@ -24,6 +24,8 @@ import {
 import ErrorView from '../LocalError';
 import { NewRelations } from '@/types';
 import { ROLE_LABEL, STATUS_LABEL } from '@/lib/labels';
+import Link from 'next/link';
+import RelationNickNameEditor from './RelationNickNameEditor';
 
 
 // swrに渡す用に作成し直して、型セット
@@ -85,6 +87,7 @@ type RelationData = { user_relations: UserRelation[] };
 const RelationsList = ({sessionId}: {sessionId: string}) => {
   const [isRelationAddFormModal, setAddFormModal] = useState(false);
   const [isEditNickNameModal, setEditNickNameModal] = useState(false);
+  const [partnerId, setPartnerId] = useState<number | undefined>();
   
   const fetcher = (url: string) => clientAxiosInstance.get(url).then(res => res.data);
 
@@ -99,9 +102,10 @@ const RelationsList = ({sessionId}: {sessionId: string}) => {
     const partner = relation.requester.id === Number(sessionId) ? relation.receiver : relation.requester;
 
     return {
-      partner_id: partner.id,
+      id: partner.id,
+      partner_id: partner.profile.partner_id,
       image: partner.image,
-      name: partner.profile.name,
+      name: partner.profile.name, // nickname: {name: value}が存在しなければprofile.nameを使用するロジックに修正する
       role: partner.role,
       status: relation.status
     }
@@ -113,8 +117,9 @@ const RelationsList = ({sessionId}: {sessionId: string}) => {
     setAddFormModal(true);
   }
 
-  const editNickNameModalHandler = () => {
-    setAddFormModal(true);
+  const editNickNameModalHandler = (partner_id: number) => {
+    setPartnerId(partner_id);
+    setEditNickNameModal(true);
   }
 
   if(isLoading) return <Loading />;
@@ -129,12 +134,19 @@ const RelationsList = ({sessionId}: {sessionId: string}) => {
 
       <div className="flex justify-end space-x-2">
         <Button onClick={relationAddFormModalHandler}>関係者を追加</Button>
-        <Button variant="outline">戻る</Button>
+        <Button variant="outline">
+          <Link href="/dashboard">戻る</Link>
+        </Button>
       </div>
 
+      {/* 関係者追加&ニックネーム変更モーダル */}
       <Dialog open={isRelationAddFormModal} onOpenChange={setAddFormModal}>
         <RelationAddForm close={setAddFormModal} mutate={mutate}/>
       </Dialog>
+      <Dialog open={isEditNickNameModal} onOpenChange={setEditNickNameModal}>
+        <RelationNickNameEditor close={setEditNickNameModal} mutate={mutate} sessionId={sessionId} partnerId={partnerId}/>
+      </Dialog>
+
 
       {/* 関係者リストが1件以上存在するか分岐 */}
       {newRelations.length === 0 ? (
@@ -144,7 +156,7 @@ const RelationsList = ({sessionId}: {sessionId: string}) => {
       ) : (
         <ul className="space-y-4">
           {newRelations.map((rel) => (
-            <li key={rel.partner_id} className="flex justify-center">
+            <li key={rel.id} className="flex justify-center">
               <Card className="w-3/4">
                 <CardContent className="flex items-center space-x-4 p-4">
  
@@ -170,7 +182,7 @@ const RelationsList = ({sessionId}: {sessionId: string}) => {
                     チャット
                   </Button>
 
-                  <Button size="sm" className="p-2 hover:text-gray-800 hover:bg-gray-100 rounded">
+                  <Button onClick={() => editNickNameModalHandler(rel.partner_id)} size="sm" className="p-2 hover:text-gray-800 hover:bg-gray-100 rounded">
                     <Pen />
                   </Button>
 

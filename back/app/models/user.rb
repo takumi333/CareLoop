@@ -20,6 +20,7 @@ class User < ApplicationRecord
   # 共有相手がアカウント削除した時点で共有スケジュールが消滅しないよう、dependent: :destroyは付けない
   has_many :shared_schedules
   has_many :schedules, through: :shared_schedules
+  has_many :received_nicknames, class_name: "Nickname", foreign_key: :rename_user_id, dependent: :destroy
 
   enum :provider, [ :line, :guest ]
   enum :role, [ :patient, :home_care_giver, :medical_personal ]
@@ -53,6 +54,10 @@ class User < ApplicationRecord
   def active?
     !delete_flag
   end
+
+  # def related_with?(other_user)
+  #   UserRelation.between(self, other_user).exists?
+  # end
 
 
   private

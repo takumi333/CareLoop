@@ -3,4 +3,5 @@ class UserRelationSerializer < ActiveModel::Serializer
 
   belongs_to :requester, serializer: UserSerializer
   belongs_to :receiver,  serializer: UserSerializer
+  has_many :nickname, serializer: NicknameSerializer
 end

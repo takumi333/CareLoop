@@ -28,16 +28,10 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { RelationAddFromProps } from '@/types'
 
 
-
-type relationAddFromProps = {
-  close: (value: React.SetStateAction<boolean>) => void,
-  mutate:  KeyedMutator<any>
-}
-
-
-const RelationAddForm = ({ close, mutate }: relationAddFromProps) => {
+const RelationAddForm = ({ close, mutate }: RelationAddFromProps) => {
 
   const formSchema = z.object({
     partner_id: z.string().length(10, {
@@ -61,6 +55,8 @@ const RelationAddForm = ({ close, mutate }: relationAddFromProps) => {
 
     } catch (error: any) {
 
+      const customId = "custom-id-yes";
+
       console.log("関係者申請処理に不備が起きました。",`${error.message}`)
       toast.error("追加関係者への申請ができませんでした。", {
         toastId: customId
@@ -68,39 +64,36 @@ const RelationAddForm = ({ close, mutate }: relationAddFromProps) => {
     }
   }
 
-  const customId = "custom-id-yes";
-
-
 
   return (
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>関係者追加フォーム</DialogTitle>
-          <DialogDescription>
-            関係者に追加したい方のpartner_idを入力して下さい。
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField
-              control={form.control}
-              name="partner_id"
-              render={({ field }) => (
-                <FormItem>
-                  {/* <FormLabel className='text-base'>partner_id: </FormLabel> */}
-                  <FormControl>
-                    <Input placeholder="partner_idを入力してください" {...field} />
-                  </FormControl>
-                  <FormMessage className="mt-1 text-red-500"/>
-                </FormItem>
-              )}
-            />
-            <div className='flex items-center justify-center'>
-              <Button type="submit" size="sm" className='w-1/4 mt-4'>Submit</Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>関係者追加フォーム</DialogTitle>
+        <DialogDescription>
+          関係者に追加したい方のpartner_idを入力して下さい。
+        </DialogDescription>
+      </DialogHeader>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <FormField
+            control={form.control}
+            name="partner_id"
+            render={({ field }) => (
+              <FormItem>
+                {/* <FormLabel className='text-base'>partner_id: </FormLabel> */}
+                <FormControl>
+                  <Input placeholder="partner_idを入力してください" {...field} />
+                </FormControl>
+                <FormMessage className="mt-1 text-red-500"/>
+              </FormItem>
+            )}
+          />
+          <div className='flex items-center justify-center'>
+            <Button type="submit" size="sm" className='w-1/4 mt-4'>送信</Button>
+          </div>
+        </form>
+      </Form>
+    </DialogContent>
   )
 }
 
