@@ -78,6 +78,7 @@ type UserRelation = {
   status: "pending" | "accepted" | "rejected",
   receiver: LiteUser,
   requester: LiteUser,
+  nicknames?: Array<{name: string}>,  // 名前変更されていないユーザーもいる為、?を付けた
 };
 
 type RelationData = { user_relations: UserRelation[] };
@@ -99,13 +100,16 @@ const RelationsList = ({sessionId}: {sessionId: string}) => {
   // console.log("relationsチェック: ", relations)
   // UIで必要な値のみを抽出
   const newRelations: Array<NewRelations> = relations?.user_relations.map((relation: any) => {
-    const partner = relation.requester.id === Number(sessionId) ? relation.receiver : relation.requester;
+    const me = Number(sessionId);
+    const partner = relation.requester.id === me ? relation.receiver : relation.requester;  // ログインユーザーと関係者関係にあるユーザー抽出
 
+    const nickname = relation.nicknames[0]?.name ?? partner.profile.name;
+      
     return {
       id: partner.id,
       partner_id: partner.profile.partner_id,
       image: partner.image,
-      name: partner.profile.name, // nickname: {name: value}が存在しなければprofile.nameを使用するロジックに修正する
+      name: nickname, // nickname: {name: value}が存在しなければprofile.nameを使用するロジックに修正する
       role: partner.role,
       status: relation.status
     }
@@ -141,10 +145,14 @@ const RelationsList = ({sessionId}: {sessionId: string}) => {
 
       {/* 関係者追加&ニックネーム変更モーダル */}
       <Dialog open={isRelationAddFormModal} onOpenChange={setAddFormModal}>
+      {isRelationAddFormModal && (
         <RelationAddForm close={setAddFormModal} mutate={mutate}/>
+      )}
       </Dialog>
       <Dialog open={isEditNickNameModal} onOpenChange={setEditNickNameModal}>
-        <RelationNickNameEditor close={setEditNickNameModal} mutate={mutate} sessionId={sessionId} partnerId={partnerId}/>
+        {isEditNickNameModal && (
+          <RelationNickNameEditor close={setEditNickNameModal} mutate={mutate} sessionId={sessionId} partnerId={partnerId}/>
+        )}
       </Dialog>
 
 
@@ -186,9 +194,10 @@ const RelationsList = ({sessionId}: {sessionId: string}) => {
                     <Pen />
                   </Button>
 
-                  <Button size="sm" className="p-2 hover:text-gray-800 hover:bg-gray-100 rounded">
+                  {/* 関係者削除機能はv2で実装 */}
+                  {/* <Button size="sm" className="p-2 hover:text-gray-800 hover:bg-gray-100 rounded">
                     <Trash2 />
-                  </Button>
+                  </Button> */}
 
                 </CardContent>
               </Card>

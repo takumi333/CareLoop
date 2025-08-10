@@ -60,6 +60,7 @@ const RelationNickNameEditor = ({ close, mutate, sessionId, partnerId }: Relatio
         }});
       await mutate();
       toast.success("関係者のネックネームを変更しました。");
+      form.reset({ nickname: "" }); 
       close(false)
 
     } catch (error: any) {

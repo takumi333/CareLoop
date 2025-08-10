@@ -3,7 +3,7 @@ export type Profile = {
     name: string;
     user: {
       id: number,
-      uid: string,
+      uid?: string,
       name: string,
       provider: string,
       role: string,
@@ -21,6 +21,7 @@ type NewRelations = {
   name: string,
   role: "patient" | "home_care_giver" | "medical_personal",
   status: "pending" | "accepted" | "rejected";
+  nicknames?: Array<{name: string}>,
 }
 
 type RelationAddFromProps = {

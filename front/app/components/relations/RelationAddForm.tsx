@@ -51,6 +51,7 @@ const RelationAddForm = ({ close, mutate }: RelationAddFromProps) => {
       const res = await clientAxiosInstance.post("/user-relations", { user_relation: { partner_id: value.partner_id }});
       await mutate();
       toast.success("関係者へ追加申請を送信しました。");
+      form.reset({ partner_id: "" });
       close(false)
 
     } catch (error: any) {

@@ -2,7 +2,7 @@ class Api::V1::UserRelationsController < ApplicationController
   def index
     user_relations = UserRelation.includes(:nicknames, requester: :profile, receiver: :profile).where(requester_id: current_user.id).or( UserRelation.where(receiver_id: current_user.id)).order(requested_at: :desc)
     # log_info('relations_dataの値をチェック!', payload: user_relations)
-    render json: user_relations, include: ['requester.profile', 'receiver.profile'], status: :ok  #includeオプションで、孫階層まで取得する(user_relation→user→profile)
+    render json: user_relations, include: ['requester.profile', 'receiver.profile', 'nicknames'], status: :ok  #includeオプションで、孫階層まで取得する(user_relation→user→profile)
   end
 
   def create
@@ -42,36 +42,39 @@ class Api::V1::UserRelationsController < ApplicationController
     render status: :created
 
   rescue ActiveRecord::RecordInvalid => e
-    log_info('resuce: 例外エラーが発生しました。', payload: e.record.errors.messages)
+    log_info('resuce: 例外エラーが発生しました。')
     render json: { errors: e.record.errors.messages }, status: :unprocessable_entity
   end
 
   def rename
     # 取得したpartner_idから、ユーザー抽出
     profile_user = Profile.find_by!(partner_id: user_relation_params[:partner_id])
-    partner = { id: profile_user[:user_id] }
-    log_info('partner: ', payload: partner)
-    # log_info('partner.id: ', payload: partner.id)
-    # そのユーザーが、current_userとuser_relationで結ばれている検証
-    p "z地点まで到達"
-    relation = UserRelation.between(current_user.id, partner[:id]).first # firstは、同一ペアが逆で登録されていた場合の2件取得してしまう保険。
+    partner_id = profile_user[:user_id]
+    log_info('partner: ', payload: partner_id)
+
+    relation = UserRelation.between(current_user.id, partner_id).first # firstは、同一ペアが逆で登録されていた場合の2件取得してしまう保険。
+
     if relation
-      # 取得したname値を、nicknameテーブルに保存する
-      p "a地点まで到達"
-      relation.nicknames.create!(
-        rename_user_id: partner[:id],
-        name: user_relation_params[:name]
-      )
-      p "b地点まで到達"
-      # 戻り値: status:ok
-      render json: { message: "名前の変更が完了しました。" }, status: :ok
+      # レコードが存在する場合、「更新をする」というコードロジックに書きかえ
+      # relation.nicknames.create!(
+      #   rename_user_id: partner_id[:id],
+      #   name: user_relation_params[:name]
+      # )
+
+      nickname = relation.nicknames.find_or_initialize_by(rename_user_id: partner_id)
+      log_info('partner: ', payload: nickname)
+      nickname.name = user_relation_params[:name]  # 既存でも新規でも共通
+      nickname.save!
+
+      render json: { message: "レコードの保存されました。" }, status: :ok
     else
       # 関係性がないので、エラー処理
       render json: { message: "関係者登録されていない可能性があります。" }, status: :unprocessable_entity
     end
 
   rescue ActiveRecord::RecordInvalid => e
-    render json: { message: e.record.errors.full_messages.to_sentence },status: :unprocessable_entity
+    log_info('レコードの保存に失敗しました。')
+    render json: { message: "レコードの保存に失敗しました。"}, status: :unprocessable_entity
   end
 
 
