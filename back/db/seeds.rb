@@ -9,10 +9,15 @@
 #   end
 
 
-GUEST_UID_BASE = "guest-#{SecureRandom.uuid}"
+guest_uid = "guest-#{SecureRandom.uuid}"
+smith_uid = "U#{SecureRandom.hex(16)}"
+john_uid  = "U#{SecureRandom.hex(16)}"
+bob_uid   = "U#{SecureRandom.hex(16)}"
 
-guest = User.find_or_create_by!(uid: GUEST_UID_BASE) do |u|
-  u.name     = 'Guest User'
-  u.provider = 1
-  u.role     = 1
-end
+
+User.create!([
+  { uid: guest_uid, name: 'Guest User', provider: :guest, role: :home_care_giver },
+  { uid: smith_uid, name: 'Smith', provider: :line, role: :patient },
+  { uid: john_uid,  name: 'Jhon',  provider: :line, role: :home_care_giver },
+  { uid: bob_uid,   name: 'Bob',   provider: :line, role: :medical_personal }
+])

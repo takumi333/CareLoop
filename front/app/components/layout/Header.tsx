@@ -1,14 +1,26 @@
-import { signOut } from '@/auth'
+'use client'
+
+import { signOut } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet"
-import { serverAxiosInstance } from '@/lib/axiosInstance/server'
+// import { serverAxiosInstance } from '@/lib/axiosInstance/server'
 import { Menu } from "lucide-react"
 import Link from "next/link"
-import { cookies } from 'next/headers'
-
+// import { cookies } from 'next/headers'
+import { mutate } from 'swr';
 import React from 'react'
+import { logoutAction } from '@/lib/actions/logout-action'
+
 
 const Header = () => {
+
+  const LogOutHandler = async () => {
+    // rails&ブラウザのcookieのリセット
+    await logoutAction();
+    // 全キーのキャッシュをクリア(ユーザー切替時に、前データが瞬間露出するバグ対策)
+    await mutate(() => true, undefined, { revalidate: false });
+    await signOut({ redirectTo: '/top' });
+  };
 
   return (
     <header className='flex w-full items-center justify-between border-b px-4 py-2 bg-blue-300'>
@@ -16,7 +28,7 @@ const Header = () => {
         CareLoop
       </Link>
       <div className="flex items-center gap-2">
-        <form
+        {/* <form
           action={async () => {
             'use server';
             // rails API側のsessionを削除
@@ -24,13 +36,17 @@ const Header = () => {
             if (res.status !== 200) console.log("cookie.user_idが削除出来ていません。");
             // ブラウザ側に保存しているcookieを削除
             (await cookies()).delete('_care_loop_session');
+            // 全キーのキャッシュをクリア(ユーザー切替時に、前データが瞬間露出するバグ対策)
+            mutate(() => true, undefined, { revalidate: false });
 
             await signOut({ redirectTo: '/top' });
           }}
         >
           <Button type="submit">ログアウト</Button>
-        </form>
+        </form> */}
 
+        <Button type="submit" onClick={LogOutHandler}>ログアウト</Button>
+        
         <Sheet>
           <SheetTrigger asChild>
             <Button

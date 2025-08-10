@@ -4,7 +4,7 @@ import { serverAxiosInstance } from '@/lib/axiosInstance/server'
 import Loading from '../loading';
 import { UserRound } from 'lucide-react';
 import { SWRConfig } from 'swr'
-import NameInlineEditor from '../components/my-page/NameInlineEditor';
+import NameInlineEditor from '../components/my-page/ProfileNameEditor';
 
 
 
@@ -36,14 +36,15 @@ const MyPage = async () => {
       <Card>
         <CardHeader className="items-center">
           <div className="relative h-24 w-24">
-            <Image
+            {/* <Image
               src={
                 "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXItcm91bmQtaWNvbiBsdWNpZGUtdXNlci1yb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSI4IiByPSI1Ii8+PHBhdGggZD0iTTIwIDIxYTggOCAwIDAgMC0xNiAwIi8+PC9zdmc+"
               }
               alt="プロフィール画像"
               fill
               className="rounded-full bg-muted object-cover"
-            />
+            /> */}
+            <UserRound size={120} className="rounded-full bg-muted object-cover" />
           </div>
 
           <Button variant="secondary" size="sm" className="mt-4" disabled>
@@ -93,6 +94,11 @@ const MyPage = async () => {
           </div>
         </CardContent>
       </Card>
+      <div className='flex justify-center w-full'>
+        <Button>
+          <Link href="/dashboard">ダッシュボードへ戻る</Link>
+        </Button>
+      </div>
     </div>
   )
 }

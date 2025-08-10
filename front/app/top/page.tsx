@@ -13,7 +13,7 @@ import { signIn } from "@/auth";
 import Link from 'next/link';
 
 import { cookies } from 'next/headers';
-import LoginButton from '../components/top/LoginButton';
+import LoginButton from '../components/top/TopLoginButton';
 
 
 

@@ -20,9 +20,10 @@ class User < ApplicationRecord
   # 共有相手がアカウント削除した時点で共有スケジュールが消滅しないよう、dependent: :destroyは付けない
   has_many :shared_schedules
   has_many :schedules, through: :shared_schedules
+  has_many :received_nicknames, class_name: "Nickname", foreign_key: :rename_user_id, dependent: :destroy
 
-  enum :provider, { line: 0, guest: 1 }
-  enum :role, { patient: 0, home_care_giver: 1, medical_personal: 2 }
+  enum :provider, [ :line, :guest ]
+  enum :role, [ :patient, :home_care_giver, :medical_personal ]
 
   # freezeで、配列オブジェクトを固定し、実行中に追加・削除できないようにする
   PROVIDERS = %w[line guest].freeze
@@ -34,7 +35,7 @@ class User < ApplicationRecord
 
   scope :deleted, -> { where(delete_flag: true)  }
 
-  # ゲストログインの場合のみ実行する条件式を加える
+  # ゲストログインの場合のみ実行する条件式を加える(本当にこの呼び出しで適切か？)
   after_create :build_initial_profile!
 
   def soft_delete
@@ -54,9 +55,14 @@ class User < ApplicationRecord
     !delete_flag
   end
 
+  # def related_with?(other_user)
+  #   UserRelation.between(self, other_user).exists?
+  # end
+
 
   private
 
+  # profileモデルのクラスメソッドとして定義するべきか？(guest_signupにて、Profileモデルから呼び出すべきでは？(単一責任))
   def build_initial_profile!
     # begin
     build_profile(

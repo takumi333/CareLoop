@@ -18,6 +18,9 @@ Rails.application.routes.draw do
       end
       resources :users, only: %i[create]
       resources :profiles, only: %i[show edit update]
+      resources :user_relations, only: %i[index create], path: 'user-relations' do
+        patch :rename, on: :member  # /api/v1/user-relations/:id/rename
+      end
     end
   end
 end

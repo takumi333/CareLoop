@@ -23,12 +23,12 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import ErrorView from '../LocalError'
 
 
-const NameInlineEditor = ({ userId }: { userId: string }) => {
+const ProfileNameEditor = ({ userId }: { userId: string }) => {
   const [editing, setEditing] = useState(false);
-  const { profileData, isError, isLoading, mutate } = useProfile(userId);
-  console.log(profileData);
+  const { profile: profileData, isError, isLoading, mutate } = useProfile(userId);
 
 
   const formSchema = z.object({
@@ -47,8 +47,8 @@ const NameInlineEditor = ({ userId }: { userId: string }) => {
   })
 
 
-
   const renameHandler = () => {
+    form.reset({ username: "" })
     setEditing(true);
   }
   
@@ -58,10 +58,12 @@ const NameInlineEditor = ({ userId }: { userId: string }) => {
       const newName = res.data.profile.name;
       if (!profileData)  { throw new Error("キャッシュを更新できませんでした。") };
       mutate({ profile: {...profileData.profile, name: newName }}, { revalidate: false });
+      setEditing(false);
 
     } catch (error) {
 
       // mutate処理以外でエラーが発生した場合のエラーハンドリング
+      const customId = "custom-id-yes";
       toast.error("データ取得に失敗しました", {
         toastId: customId
       });
@@ -70,16 +72,16 @@ const NameInlineEditor = ({ userId }: { userId: string }) => {
 
 
   // ロード中&エラー時のハンドリング
-  const customId = "custom-id-yes";
-  useEffect(() => {
-    if (isError) toast.error("データ取得に失敗しました", {
-          toastId: customId
-        });
-        console.log("SWR fetcher error:", isError);
-  }, [isError]);
+  // const customId = "custom-id-yes";
+  // useEffect(() => {
+  //   if (isError) toast.error("データ取得に失敗しました", {
+  //         toastId: customId
+  //       });
+  //       console.log("SWR fetcher error:", isError);
+  // }, [isError]);
 
   if (isLoading) return  <Loading />
-
+  if(isError) return <ErrorView onRetry={() => mutate()}/>;
 
 
   return (
@@ -116,4 +118,4 @@ const NameInlineEditor = ({ userId }: { userId: string }) => {
   )
 }
 
-export default NameInlineEditor
+export default ProfileNameEditor

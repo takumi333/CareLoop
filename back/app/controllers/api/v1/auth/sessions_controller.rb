@@ -3,8 +3,8 @@ class Api::V1::Auth::SessionsController < ApplicationController
 
   def destroy
     # Rails.logger.debug request.headers['Cookie']
-    # p session.loaded?          # true なら Cookie の復号に成功
-    # p session.to_hash          # {:user_id=>28} のように入っているか
+    # p session.loaded?
+    # p session.to_hash
 
     reset_session
     head :ok

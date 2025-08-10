@@ -59,7 +59,7 @@ const handler = async (req: NextRequest, context: { params: Promise<{ path: stri
   
     
     
-    console.log("nextResのset-cookieを確認する", nextRes)
+    // console.log("nextResのset-cookieを確認する", nextRes)
     return nextRes;
 
   } catch (error) {
