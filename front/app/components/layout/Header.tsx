@@ -1,15 +1,17 @@
 'use client'
 
 import { signOut } from 'next-auth/react'
-import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet"
-// import { serverAxiosInstance } from '@/lib/axiosInstance/server'
-import { Menu } from "lucide-react"
 import Link from "next/link"
-// import { cookies } from 'next/headers'
 import { mutate } from 'swr';
 import React from 'react'
 import { logoutAction } from '@/lib/actions/logout-action'
+
+
+import { Button } from '@/components/ui/button'
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet"
+import { Menu } from "lucide-react"
+import { Bell } from 'lucide-react';
+import { clientAxiosInstance } from '@/lib/axiosInstance/client';
 
 
 const Header = () => {
@@ -21,6 +23,11 @@ const Header = () => {
     await mutate(() => true, undefined, { revalidate: false });
     await signOut({ redirectTo: '/top' });
   };
+
+  const getNotifications = async () => {
+    const res = await clientAxiosInstance.get("/notifications")
+    console.log(res.data);
+  }
 
   return (
     <header className='flex w-full items-center justify-between border-b px-4 py-2 bg-blue-300'>
@@ -46,6 +53,7 @@ const Header = () => {
         </form> */}
 
         <Button type="submit" onClick={LogOutHandler}>ログアウト</Button>
+        <Bell onClick={getNotifications}/>
         
         <Sheet>
           <SheetTrigger asChild>

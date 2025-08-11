@@ -5,7 +5,7 @@ class Api::V1::UserRelationsController < ApplicationController
     render json: user_relations, include: ['requester.profile', 'receiver.profile', 'nicknames'], status: :ok  #includeオプションで、孫階層まで取得する(user_relation→user→profile)
   end
 
-  def create
+  def apply
     ipnut_partner_id = user_relation_params[:partner_id]
     unless ipnut_partner_id
       return render json: { message: "partner_idが送信されていません" }, status: :unprocessable_entity
@@ -44,6 +44,14 @@ class Api::V1::UserRelationsController < ApplicationController
   rescue ActiveRecord::RecordInvalid => e
     log_info('resuce: 例外エラーが発生しました。')
     render json: { errors: e.record.errors.messages }, status: :unprocessable_entity
+  end
+
+  # 申請受信者が承諾
+  def approve
+  end
+
+  # 申請受信者が拒否
+  def reject
   end
 
   def rename
