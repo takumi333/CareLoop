@@ -45,7 +45,10 @@ const NotificationBell = () => {
   console.log("notificationData: ",notificationData)
 
   if(isLoading) return;
-  if(isError) return <ErrorView onRetry={() => mutate()}/>;
+  if(isError) {
+    console.log("通知データの取得ができませんでした。",isError.message)
+    return;
+  }
 
 
   // 配列部分を事前に変数代入
@@ -76,18 +79,21 @@ const NotificationBell = () => {
     }
   }
 
-  // 自分でロジックの意味理解してから、時間表示UIロジックに使用する
-  // function fromNow(iso: string) {
-  //   const d = new Date(iso);
-  //   const sec = Math.floor((Date.now() - d.getTime()) / 1000);
-  //   if (sec < 60) return `${sec}s 前`;
-  //   const min = Math.floor(sec / 60);
-  //   if (min < 60) return `${min}m 前`;
-  //   const hr = Math.floor(min / 60);
-  //   if (hr < 24) return `${hr}h 前`;
-  //   const day = Math.floor(hr / 24);
-  //   return `${day}d 前`;
-  // }
+  // 通知が来た時刻生成ロジック
+  const fromNow = (jst: string) => {
+    const d = new Date(jst);
+    const sec = Math.floor((Date.now() - d.getTime()) / 1000);
+    console.log("d: ",d)
+    console.log("Date.now() :",Date.now())
+    console.log("d.getTime(): ", d.getTime())
+    if (sec < 60) return `${sec}s 前`;
+    const min = Math.floor(sec / 60);
+    if (min < 60) return `${min}m 前`;
+    const hr = Math.floor(min / 60);
+    if (hr < 24) return `${hr}h 前`;
+    const day = Math.floor(hr / 24);
+    return `${day}d 前`;
+  }
 
 
   return (
@@ -107,24 +113,10 @@ const NotificationBell = () => {
 
       <PopoverContent>
         {/* 通知一覧のタイトル&未読バッジ?&全て既読状態にする機能 */}
-        {/* <div className="flex items-center justify-between px-3 py-2">
-          <div className="text-sm font-semibold">通知</div>
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="text-xs">未読 {unreadCount}</Badge>
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={unreadCount === 0 || marking === "all"}
-              onClick={markAllRead}
-              className="gap-1"
-            >
-              {marking === "all" ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCheck className="h-4 w-4" />}
-              すべて既読
-            </Button>
-          </div>
-        </div> */}
+        <div className="flex items-center justify-center px-3 py-2">
+          <div className="text-sm font-semibold">通知一覧</div>
+        </div>
         <Separator />
-
 
         <ScrollArea className="h-80">
           {list?.length === 0 ? (
@@ -138,11 +130,6 @@ const NotificationBell = () => {
                 key={n.id}
                 className={`flex items-start gap-3 rounded-md p-2 transition hover:bg-accent/50 ${n.checked ? "opacity-80" : ""}`}
               >
-                {/* <Avatar className="h-8 w-8">
-                  <AvatarFallback className="text-[10px]">
-                    {abbr(n.action)}
-                  </AvatarFallback>
-                </Avatar> */}
 
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm">
@@ -151,10 +138,9 @@ const NotificationBell = () => {
                       <span className="ml-2 align-middle text-[10px] text-red-600">未読</span>
                     )}
                   </p>
-                  {/* 時間表示ロジックを理解してからコメントアウト外す */}
-                  {/* <p className="mt-1 text-xs text-muted-foreground">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     {fromNow(n.created_at)}
-                  </p> */}
+                  </p>
                 </div>
 
                 {!n.checked ? (

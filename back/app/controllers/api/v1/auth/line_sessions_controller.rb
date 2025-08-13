@@ -50,7 +50,7 @@ class Api::V1::Auth::LineSessionsController < ApplicationController
         } 
        }
 
-      render json: { user: user}, status: :ok
+      render json: { user: user }, status: :ok
     end
   end
 

@@ -48,7 +48,7 @@ const RelationAddForm = ({ close, mutate }: RelationAddFromProps) => {
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
     try {
-      const res = await clientAxiosInstance.post("/user-relations", { user_relation: { partner_id: value.partner_id }});
+      const res = await clientAxiosInstance.post("/user-relations/apply", { user_relation: { partner_id: value.partner_id }});
       await mutate();
       toast.success("関係者へ追加申請を送信しました。");
       form.reset({ partner_id: "" });
