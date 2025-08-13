@@ -23,8 +23,20 @@ class Api::V1::NotificationsController < ApplicationController
   end
 
   def unread_count
+    recipiented_notifications = Notification.where(recipient_id: current_user.id)
+    unread_notifications = recipiented_notifications.where(checked: false)
+    unread_count = unread_notifications.count
+    render json: { notifications: unread_count}, status: :ok
   end
 
   def mark_read
+  end
+
+
+  private
+
+  def notification_params
+    # 取得するカラム追加する
+    # params.require(:notification).permit(:)
   end
 end

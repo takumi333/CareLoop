@@ -32,6 +32,7 @@ type NotificationsResponse = {
 
 const NotificationBell = () => {
   const [open, setOpen] = useState(false);
+  const [unread, setUnreadCount] = useState(0);
   
 
   const fetcher = (url: string) => clientAxiosInstance.get(url).then(res => res.data);
@@ -44,18 +45,26 @@ const NotificationBell = () => {
   });
   console.log("notificationData: ",notificationData)
 
+  // 配列部分を事前に変数代入
+  const list = notificationData?.notifications;
+
+  // ポーリング取得でデータに変化がなければ未読カウント処理させない
+  const unreadCount = useMemo(
+    () => {
+      const unread = list?.filter((n: NotificationItem) => !n.checked).length
+      if (typeof unread === "number") setUnreadCount(unread);
+    },
+    [list]
+  );
+
+
   if(isLoading) return;
   if(isError) {
     console.log("通知データの取得ができませんでした。",isError.message)
     return;
   }
-
-
-  // 配列部分を事前に変数代入
-  const list = notificationData?.notifications;
-
-  const unreadCount = () => list?.filter((n: NotificationItem) => !n.checked).length;
   
+
   // 既読済みに変換
   const markRead = async (id: number) => {
     try {
@@ -101,12 +110,12 @@ const NotificationBell = () => {
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
-          {/* 表示件数の表示ロジック */}
-          {/* {unreadCount > 0 && (
+          {/* 表示件数の表示 */}
+          {unread > 0 && (
             <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-xs font-semibold text-white">
-              {unreadCount > 99 ? "99+" : unreadCount}
+              {unread > 99 ? "99+" : unread}
             </span>
-          )} */}
+          )}
           <span className="sr-only">通知を開く</span>
         </Button>
       </PopoverTrigger>
