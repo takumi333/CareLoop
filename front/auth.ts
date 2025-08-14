@@ -43,7 +43,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
               return null;
             }
   
-            // console.log("レスポンスデータ！！！！", res.data)
+            console.log("レスポンスデータ！！！！", res.data)
             const data: AuthData = authDataSchema.parse(res.data);
 
             // set-cookieをブラウザへ転送
@@ -208,7 +208,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth(req => {
 
             
             // userオブジェクトに、UIロジックに必要になるデータを格納
-            // console.log("レスポンスデータ！！！！", res.data);
+            console.log("レスポンスデータ！！！！", res.data);
             const data: AuthData = authDataSchema.parse(res.data);
             user.user_id = data.user.id;
             user.provider = data.user.provider

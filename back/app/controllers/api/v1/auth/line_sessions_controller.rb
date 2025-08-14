@@ -18,16 +18,39 @@ class Api::V1::Auth::LineSessionsController < ApplicationController
 
       user.save!
       session[:user_id] = user.id
-      p "user_idに代入された値確認!!"
-      p session[:user_id]
-      render json: user, status: :created
+      # p "user_idに代入された値確認!!"
+      # p session[:user_id]
+
+      user = {
+        id: user.id,
+        uid: user.uid,
+        provider: user.provider,
+        name: user.name,
+        role: user.role,
+        profile: {
+          partner_id: user.profile.partner_id
+        } 
+       }
+
+      render json: { user: user}, status: :created
     else
       session[:user_id] = user.id
-      p "user_idに代入された値確認!!"
-      p session[:user_id]
+      # p "user_idに代入された値確認!!"
+      # p session[:user_id]
       # p "sessionに代入されたキーを確認!!"
       # Rails.logger.debug "[CREATE] after set session.loaded?=#{session.loaded?} hash=#{session.to_hash.inspect}"
-      render json: user, status: :ok
+      user = {
+        id: user.id,
+        uid: user.uid,
+        provider: user.provider,
+        name: user.name,
+        role: user.role,
+        profile: {
+          partner_id: user.profile.partner_id
+        } 
+       }
+
+      render json: { user: user }, status: :ok
     end
   end
 

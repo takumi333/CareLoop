@@ -18,8 +18,19 @@ Rails.application.routes.draw do
       end
       resources :users, only: %i[create]
       resources :profiles, only: %i[show edit update]
-      resources :user_relations, only: %i[index create], path: 'user-relations' do
-        patch :rename, on: :member  # /api/v1/user-relations/:id/rename
+      resources :user_relations, only: %i[index], path: 'user-relations' do
+        post :apply, on: :collection
+        member do
+          patch :approve # /api/v1/user-relations/:id/approve
+          patch :reject  # /api/v1/user-relations/:id/reject
+          patch :rename  # /api/v1/user-relations/:id/rename
+        end
+      end
+      resources :notifications, only: %i[index], path: 'notifications' do
+        collection do
+          get :unread_count # /api/v1/notifications/unread_count
+          patch :mark_read  # /api/v1/notifications/mark_read
+        end
       end
     end
   end
