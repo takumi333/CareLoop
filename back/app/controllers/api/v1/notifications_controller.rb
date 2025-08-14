@@ -33,7 +33,6 @@ class Api::V1::NotificationsController < ApplicationController
     notification_id = notification_params[:id]
     received_notification = Notification.find(notification_id)
     if received_notification.update(checked: true)
-      # 既読済みのレコードのみ抽出して返す??
       render json: { message: "既読状態に更新しました。" }, status: :ok
     else
       render json: { message: "既読状態に更新できませんでした。" }, status: :unprocessable_entity

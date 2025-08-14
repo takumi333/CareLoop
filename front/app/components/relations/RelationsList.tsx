@@ -178,7 +178,7 @@ const RelationsList = ({sessionId}: {sessionId: string}) => {
                         {rel.name}
                       </div>
                       <div className=" px-2 py-0.5 text-sm text-yellow-800">
-                       ({STATUS_LABEL[rel.status]})
+                       {rel.status === "pending" ? `(${STATUS_LABEL[rel.status]})` : null}
                       </div>
                     </div>
                     <span className="inline-block mt-1 px-2 py-0.5 text-sm font-medium bg-green-100 text-green-800 rounded">

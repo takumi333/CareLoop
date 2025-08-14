@@ -17,7 +17,12 @@ import NotificationBell from '../notifications/NotificationBell';
 
 const Header = () => {
   const { data: session, status } =  useSession();
+
+  if (typeof session  === "undefined") return;
+  const sessionId = session?.user.user_id ?? "";
+
   const isLoggedIn = status === "authenticated";
+  
   const LogOutHandler = async () => {
     // rails&ブラウザのcookieのリセット
     await logoutAction();
@@ -56,7 +61,7 @@ const Header = () => {
         {isLoggedIn && 
           <>
             <Button type="submit" onClick={LogOutHandler}>ログアウト</Button>
-          <NotificationBell />
+          <NotificationBell sessionId={sessionId} />
           
           <Sheet>
             <SheetTrigger asChild>

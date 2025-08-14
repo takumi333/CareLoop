@@ -28,7 +28,7 @@ type NotificationsResponse = {
 };
 
 
-const NotificationBell = () => {
+const NotificationBell = ({ sessionId }: { sessionId: string }) => {
   const [open, setOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   // 既読済みレコード
@@ -70,10 +70,35 @@ const NotificationBell = () => {
     try {
       await clientAxiosInstance.patch("/notifications/mark_read", { notification: { id: id } });
       mutate();
-    } catch (e) {
-      console.error(e);
+    } catch (error: any) {
+      console.log("errorメッセージ: ", error.message);
     }
   };
+  
+  // 関係者通知
+  // 承認ボタン処理
+  const approve = async (id: number) => {
+    try {
+      console.log("sessionId: ",sessionId)
+      await clientAxiosInstance.patch(`user-relations/${sessionId}/approve`, { user_relation: { notification_id: id }})
+      mutate();
+    } catch (error: any) {
+      console.error("errorメッセージ: ", error.message);
+    }
+  };
+
+
+  // 拒否ボタン処理
+  const reject = async (id: number) => {
+    try {
+      console.log("sessionId: ",sessionId)
+      await clientAxiosInstance.patch(`user-relations/${sessionId}/reject`, { user_relation: { notification_id: id }})
+      mutate();
+    } catch (error: any) {
+      console.error("errorメッセージ: ", error.message);
+    }
+  };
+
 
   const renderTitle = (n:NotificationItem) => {
     switch (n.action) {
@@ -140,9 +165,34 @@ const NotificationBell = () => {
                   <div className="truncate text-sm">
                     {renderTitle(n)}
                   </div>
-                  <div className="mt-1 text-xs text-muted-foreground">
-                    {fromNow(n.created_at)}
-                    {!n.checked ? (
+                  <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                    <span>{fromNow(n.created_at)}</span>
+
+                    {!n.checked && n.action === "relation" ? (
+                      <div className="flex items-center gap-1"> 
+                        <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => approve(n.id)}
+                        // disabled={marking === n.id}
+                        className="gap-1"
+                        >
+                          承認
+                        </Button>
+
+                        <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => reject(n.id)}
+                        // disabled={marking === n.id}
+                        className="gap-1"
+                        >
+                          拒否
+                        </Button>
+                      </div>
+                    ) : (
+                    // コメント,チャット通知用UI
+                    !n.checked ? (
                       <Button
                         variant="ghost"
                         size="sm"
@@ -153,9 +203,9 @@ const NotificationBell = () => {
                         <CheckCheck className="h-4 w-4" />
                         既読済みにする
                       </Button>
-                    ) : 
+                    ) : (
                     <span className='ml-5'>既読済み</span>
-                    }
+                    ))}
                   </div>
                 </div>
               </li>
