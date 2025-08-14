@@ -1,14 +1,12 @@
 'use client'
 
-import Loading from '@/app/loading';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { clientAxiosInstance } from '@/lib/axiosInstance/client';
-import { Bell } from 'lucide-react';
+import { Bell, CheckCheck, Loader2 } from 'lucide-react';
 import React, { useMemo, useState } from 'react'
 import useSWR from 'swr';
-import ErrorView from '../LocalError';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 
@@ -32,7 +30,9 @@ type NotificationsResponse = {
 
 const NotificationBell = () => {
   const [open, setOpen] = useState(false);
-  const [unread, setUnreadCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
+  // 既読済みレコード
+  // const [markReadId, setMarkReadId] = useState<number| null>();
   
 
   const fetcher = (url: string) => clientAxiosInstance.get(url).then(res => res.data);
@@ -49,7 +49,7 @@ const NotificationBell = () => {
   const list = notificationData?.notifications;
 
   // ポーリング取得でデータに変化がなければ未読カウント処理させない
-  const unreadCount = useMemo(
+  const unreadCountRes = useMemo(
     () => {
       const unread = list?.filter((n: NotificationItem) => !n.checked).length
       if (typeof unread === "number") setUnreadCount(unread);
@@ -66,9 +66,9 @@ const NotificationBell = () => {
   
 
   // 既読済みに変換
-  const markRead = async (id: number) => {
+  const markReadRes = async (id: number) => {
     try {
-      await clientAxiosInstance.post("/notifications/mark_read", { notifications: { id: id } });
+      await clientAxiosInstance.patch("/notifications/mark_read", { notification: { id: id } });
       mutate();
     } catch (e) {
       console.error(e);
@@ -78,11 +78,11 @@ const NotificationBell = () => {
   const renderTitle = (n:NotificationItem) => {
     switch (n.action) {
       case "relation":
-        return `${n.recipient_name}から関係者申請が届きました`;
+        return `${n.recipient_name}さんから関係者申請が届きました`;
       case "message":
-        return `${n.recipient_name}新しいメッセージがあります`;
+        return `${n.recipient_name}さんから新しいメッセージがあります`;
       case "comment":
-        return `${n.recipient_name}コメントが付きました`;
+        return `${n.recipient_name}さんからコメントがありました`;
       default:
         return `${n.recipient_name}通知が届きました`;
     }
@@ -92,9 +92,6 @@ const NotificationBell = () => {
   const fromNow = (jst: string) => {
     const d = new Date(jst);
     const sec = Math.floor((Date.now() - d.getTime()) / 1000);
-    console.log("d: ",d)
-    console.log("Date.now() :",Date.now())
-    console.log("d.getTime(): ", d.getTime())
     if (sec < 60) return `${sec}s 前`;
     const min = Math.floor(sec / 60);
     if (min < 60) return `${min}m 前`;
@@ -111,9 +108,9 @@ const NotificationBell = () => {
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
           {/* 表示件数の表示 */}
-          {unread > 0 && (
+          {unreadCount > 0 && (
             <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-xs font-semibold text-white">
-              {unread > 99 ? "99+" : unread}
+              {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           )}
           <span className="sr-only">通知を開く</span>
@@ -139,36 +136,28 @@ const NotificationBell = () => {
                 key={n.id}
                 className={`flex items-start gap-3 rounded-md p-2 transition hover:bg-accent/50 ${n.checked ? "opacity-80" : ""}`}
               >
-
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm">
+                  <div className="truncate text-sm">
                     {renderTitle(n)}
-                    {!n.checked && (
-                      <span className="ml-2 align-middle text-[10px] text-red-600">未読</span>
-                    )}
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
+                  </div>
+                  <div className="mt-1 text-xs text-muted-foreground">
                     {fromNow(n.created_at)}
-                  </p>
+                    {!n.checked ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => markReadRes(n.id)}
+                        // disabled={marking === n.id}
+                        className="gap-1"
+                      >
+                        <CheckCheck className="h-4 w-4" />
+                        既読済みにする
+                      </Button>
+                    ) : 
+                    <span className='ml-5'>既読済み</span>
+                    }
+                  </div>
                 </div>
-
-                {!n.checked ? (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => markRead(n.id)}
-                    // disabled={marking === n.id}
-                    className="gap-1"
-                  >
-                  {/* {marking === n.id ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <CheckCheck className="h-4 w-4" />
-                  )} */}
-                    既読
-                  </Button>
-                ) : null}
-
               </li>
             ))}
           </ul>

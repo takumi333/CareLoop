@@ -1,6 +1,6 @@
 class Api::V1::NotificationsController < ApplicationController
   def index
-    notifications = Notification.includes(sender: :profile).where(recipient_id: current_user.id)
+    notifications = Notification.includes(sender: :profile).where(recipient_id: current_user.id).limit(99).order(created_at: :DESC)
     log_info('notifications: ', payload: notifications)
 
     notifications = 
@@ -30,13 +30,20 @@ class Api::V1::NotificationsController < ApplicationController
   end
 
   def mark_read
+    notification_id = notification_params[:id]
+    received_notification = Notification.find(notification_id)
+    if received_notification.update(checked: true)
+      # 既読済みのレコードのみ抽出して返す??
+      render json: { message: "既読状態に更新しました。" }, status: :ok
+    else
+      render json: { message: "既読状態に更新できませんでした。" }, status: :unprocessable_entity
+    end
   end
 
 
   private
 
   def notification_params
-    # 取得するカラム追加する
-    # params.require(:notification).permit(:)
+    params.require(:notification).permit(:id)
   end
 end
